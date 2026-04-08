@@ -1,9 +1,9 @@
-ARG CUDA_VERSION=12.8.1
-ARG UBUNTU_VERSION=24.04
+ARG ROCM_VERSION=6.2
+ARG UBUNTU_VERSION=22.04
 ARG PYTHON_VERSION=3.12
 
 # Build stage
-FROM nvidia/cuda:${CUDA_VERSION}-devel-ubuntu${UBUNTU_VERSION} AS builder
+FROM rocm/dev-ubuntu-${UBUNTU_VERSION}:${ROCM_VERSION} AS builder
 
 ARG PYTHON_VERSION
 
@@ -25,14 +25,18 @@ WORKDIR /app
 COPY pyproject.toml ./
 COPY python/ ./python/
 
-# Create venv and install dependencies
+# Create venv and install dependencies.
+# torch must be installed first from the ROCm wheel index so that the
+# subsequent package install does not pull the CUDA build from PyPI.
 RUN uv venv --python=python${PYTHON_VERSION} /app/.venv \
     && . /app/.venv/bin/activate \
-    && uv pip install -e ".[cuda]" \
+    && uv pip install torch==2.5.1+rocm6.2 \
+        --index-url https://download.pytorch.org/whl/rocm6.2 \
+    && uv pip install -e ".[rocm]" \
     && uv pip install torch-c-dlpack-ext
 
 # Runtime stage
-FROM nvidia/cuda:${CUDA_VERSION}-devel-ubuntu${UBUNTU_VERSION} AS runtime
+FROM rocm/dev-ubuntu-${UBUNTU_VERSION}:${ROCM_VERSION} AS runtime
 
 ARG PYTHON_VERSION
 
@@ -48,21 +52,24 @@ RUN useradd --create-home --shell /bin/bash --uid 1001 minisgl
 COPY --from=builder --chown=minisgl:minisgl /app /app
 
 # Create cache directories
-RUN mkdir -p /app/.cache/huggingface /app/.cache/tvm-ffi /app/.cache/flashinfer \
+RUN mkdir -p /app/.cache/huggingface /app/.cache/tvm-ffi \
     && chown -R minisgl:minisgl /app/.cache
 
 WORKDIR /app
 
 # Environment configuration
-ENV CUDA_HOME=/usr/local/cuda
-ENV PATH="${CUDA_HOME}/bin:/app/.venv/bin:${PATH}"
-ENV LD_LIBRARY_PATH="${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}"
+ENV ROCM_HOME=/opt/rocm
+ENV PATH="${ROCM_HOME}/bin:/app/.venv/bin:${PATH}"
+ENV LD_LIBRARY_PATH="${ROCM_HOME}/lib:${LD_LIBRARY_PATH}"
 ENV PYTHONUNBUFFERED=1
 
-# Set up cache directories
+# CDNA2 / gfx90a device identifier — required by some ROCm tools that probe
+# the GFX version string at runtime (e.g. triton, torch.compile)
+ENV HSA_OVERRIDE_GFX_VERSION=9.0.0
+
+# Cache directories
 ENV HF_HOME=/app/.cache/huggingface
 ENV TVM_FFI_CACHE_DIR=/app/.cache/tvm-ffi
-ENV FLASHINFER_WORKSPACE_BASE=/app/.cache/flashinfer
 
 USER minisgl
 
