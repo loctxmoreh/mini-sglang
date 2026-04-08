@@ -27,18 +27,24 @@ dependencies = [
     "modelscope",
     "torch<2.10.0",
     "transformers>=4.56.0,<=4.57.3",
-    "flashinfer-python>=0.5.3",
     "pyzmq",
     "uvicorn",
     "fastapi",
     "prompt_toolkit",
     "openai",
     "apache-tvm-ffi>=0.1.4",
-    "sgl_kernel>=0.3.17.post1",
-    "quack-kernels",
+    "torch-c-dlpack-ext",
 ]
 
 [project.optional-dependencies]
+# CUDA-only kernels — install with:  uv pip install -e ".[cuda]"
+cuda = [
+    "flashinfer-python>=0.5.3",
+    "sgl_kernel>=0.3.17.post1",
+    "quack-kernels",
+]
+# ROCm placeholder — grows as kernel replacements are added during porting
+rocm = []
 dev = [
     "pytest>=6.0",
     "pytest-cov>=2.0",
@@ -138,3 +144,26 @@ module = [
     "datasets.*",
 ]
 ignore_missing_imports = true
+
+# ---------------------------------------------------------------------------
+# uv — named wheel indexes
+# These are declared for reference and explicit use via --index-url flags.
+# See scripts/dev-setup.sh and Dockerfile.rocm for the install commands.
+#
+# CUDA (default — torch resolves from PyPI):
+#   uv pip install -e ".[cuda,dev]"
+#
+# ROCm 6.2 (two-step: install torch first, then the package):
+#   uv pip install torch==2.5.1+rocm6.2 \
+#       --index-url https://download.pytorch.org/whl/rocm6.2
+#   uv pip install -e ".[rocm,dev]"
+
+[[tool.uv.index]]
+name     = "pytorch-rocm62"
+url      = "https://download.pytorch.org/whl/rocm6.2"
+explicit = true
+
+[[tool.uv.index]]
+name     = "pytorch-cu128"
+url      = "https://download.pytorch.org/whl/cu128"
+explicit = true
