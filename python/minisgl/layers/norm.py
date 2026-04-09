@@ -69,12 +69,22 @@ def _triton_rmsnorm(
     out: torch.Tensor | None = None,
 ) -> torch.Tensor:
     shape = x.shape
-    x_2d = x.view(-1, shape[-1])
+    x_2d = x.reshape(-1, shape[-1])
     M, N = x_2d.shape
     BLOCK_N = triton.next_power_of_2(N)
-    y_2d = out.view(-1, shape[-1]) if out is not None else torch.empty_like(x_2d)
+    if out is not None:
+        y_2d = out.reshape(-1, shape[-1])
+        # reshape returns a copy when `out` is non-contiguous; detect it.
+        out_is_copy = (out.numel() > 0) and (y_2d.data_ptr() != out.data_ptr())
+    else:
+        y_2d = torch.empty_like(x_2d)
+        out_is_copy = False
     _rmsnorm_kernel[(M,)](x_2d, weight, y_2d, x_2d.stride(0), N, eps, BLOCK_N=BLOCK_N)
-    return out if out is not None else y_2d.view(shape)
+    if out is not None:
+        if out_is_copy:
+            out.copy_(y_2d.reshape(shape))
+        return out
+    return y_2d.reshape(shape)
 
 
 def _triton_fused_add_rmsnorm(
@@ -85,8 +95,8 @@ def _triton_fused_add_rmsnorm(
 ) -> None:
     """In-place: residual += x; x = rmsnorm(residual)."""
     shape = x.shape
-    x_2d = x.view(-1, shape[-1])
-    r_2d = residual.view(-1, shape[-1])
+    x_2d = x.reshape(-1, shape[-1])
+    r_2d = residual.reshape(-1, shape[-1])
     M, N = x_2d.shape
     BLOCK_N = triton.next_power_of_2(N)
     _fused_add_rmsnorm_kernel[(M,)](
