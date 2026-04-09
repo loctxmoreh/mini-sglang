@@ -46,14 +46,28 @@ class AttentionLayer(StateLessOP):
 
     def forward(self, qkv: torch.Tensor) -> torch.Tensor:
         ctx = get_global_ctx()
+        batch = ctx.batch
         q, k, v = qkv.split([self.qo_attn_dim, self.kv_attn_dim, self.kv_attn_dim], dim=-1)
-        # reshape to [T, heads, head_dim] for norm and rotary
-        q = q.view(-1, self.num_qo_heads, self.head_dim)
-        k = k.view(-1, self.num_kv_heads, self.head_dim)
+        # Ensure q/k are contiguous before reshape (split may produce non-contiguous views)
+        q = q.contiguous().view(-1, self.num_qo_heads, self.head_dim)
+        k = k.contiguous().view(-1, self.num_kv_heads, self.head_dim)
+        T = q.shape[0]
         if self.q_norm is not None:
             self.q_norm.forward_inplace(q)
         if self.k_norm is not None:
             self.k_norm.forward_inplace(k)
-        q, k = self.rotary.forward(ctx.batch.positions, q, k)
-        o = ctx.attn_backend.forward(q, k, v, self.layer_id, ctx.batch)
+        positions = batch.positions
+        if positions.shape[0] != T:
+            raise RuntimeError(
+                f"[Layer {self.layer_id}] RoPE shape mismatch: "
+                f"q has {T} tokens but positions has {positions.shape[0]} elements. "
+                f"batch.phase={batch.phase}, batch.size={batch.size}, "
+                f"batch.padded_size={batch.padded_size}, "
+                f"input_ids.shape={batch.input_ids.shape}, "
+                f"qkv.shape={qkv.shape}, "
+                f"qo_attn_dim={self.qo_attn_dim}, "
+                f"num_qo_heads={self.num_qo_heads}, head_dim={self.head_dim}"
+            )
+        q, k = self.rotary.forward(positions, q, k)
+        o = ctx.attn_backend.forward(q, k, v, self.layer_id, batch)
         return o.view(-1, self.qo_attn_dim)

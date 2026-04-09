@@ -227,6 +227,17 @@ class Scheduler(SchedulerIOMixin):
     def _forward(self, forward_input: ForwardInput) -> ForwardOutput:
         batch, sample_args, input_mapping, output_mapping = forward_input
         batch.input_ids = self.token_pool[input_mapping]
+        # Sanity: positions and input_ids must have the same token count
+        n_pos = batch.positions.shape[0]
+        n_ids = batch.input_ids.shape[0]
+        if n_pos != n_ids:
+            raise RuntimeError(
+                f"BUG: positions ({n_pos}) and input_ids ({n_ids}) have different sizes! "
+                f"batch.phase={batch.phase}, batch.size={batch.size}, "
+                f"batch.padded_size={batch.padded_size}, "
+                f"input_mapping[0].shape={input_mapping[0].shape}, "
+                f"input_mapping[1].shape={input_mapping[1].shape}"
+            )
         forward_output = self.engine.forward_batch(batch, sample_args)
         self.token_pool[output_mapping] = forward_output.next_tokens_gpu
         self.decode_manager.filter_reqs(forward_input.batch.reqs)
