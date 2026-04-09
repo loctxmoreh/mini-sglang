@@ -31,3 +31,6 @@ env/
 # .vscode
 .vscode/
 .coverage
+
+# uv lock file (platform-specific; not committed)
+uv.lock

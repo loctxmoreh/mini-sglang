@@ -30,6 +30,16 @@
 
 #include <dlpack/dlpack.h>
 
+// Device-type alias that resolves to the correct enum value for the current
+// GPU runtime:  kDLCUDA (2) on NVIDIA/CUDA,  kDLROCM (10) on AMD/ROCm.
+// MINISGL_ROCM is defined by kernel/utils.py for all compilations on ROCm,
+// including plain C++ files where __HIP__ may not be set.
+#if defined(MINISGL_ROCM) || defined(__HIP__)
+inline constexpr DLDeviceType kDLGPU = kDLROCM;
+#else
+inline constexpr DLDeviceType kDLGPU = kDLCUDA;
+#endif
+
 #include <concepts>
 #include <ostream>
 #include <sstream>

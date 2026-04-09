@@ -85,6 +85,17 @@ if [[ "$PLATFORM" == "rocm" ]]; then
         --python "${VENV_DIR}/bin/python" \
         torch-c-dlpack-ext
 
+    # torch-c-dlpack-ext ships a prebuilt .so that links against
+    # libtorch_cuda.so, which doesn't exist on ROCm (there's libtorch_hip.so).
+    # Patch core.py to use the -cpu variant when torch.version.hip is set;
+    # the cpu variant resolves all deps through libtorch_python.so and works
+    # correctly for ROCm tensors.
+    DLPACK_CORE=$(${VENV_DIR}/bin/python -c \
+        "import torch_c_dlpack_ext, os; print(os.path.join(os.path.dirname(torch_c_dlpack_ext.__file__), 'core.py'))")
+    sed -i 's/suffix = "cuda" if torch.cuda.is_available() else "cpu"/suffix = "cuda" if (torch.cuda.is_available() and not getattr(torch.version, "hip", None)) else "cpu"/' \
+        "${DLPACK_CORE}"
+    echo "Patched torch_c_dlpack_ext for ROCm: ${DLPACK_CORE}"
+
     # ---------------------------------------------------------------------------
     # ROCm environment hints
     # ---------------------------------------------------------------------------

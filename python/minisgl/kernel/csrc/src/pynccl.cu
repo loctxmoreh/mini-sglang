@@ -1,4 +1,10 @@
+// On ROCm use the system RCCL header (ships with hip_runtime.h, no cuda deps).
+// On CUDA use the bundled NCCL 2.27 header.
+#ifdef __HIP__
+#include <rccl/rccl.h>
+#else
 #include <minisgl/nccl227.h>
+#endif
 #include <minisgl/tensor.h>
 #include <minisgl/utils.cuh>
 #include <minisgl/utils.h>
@@ -82,17 +88,20 @@ public:
     NCCL_CHECK(::ncclMemAlloc(&buf, max_bytes));
     m_sym_mem = {buf, template_fn<::ncclMemFree>};
 
+#if NCCL_VERSION_CODE >= 22700
+    // Symmetric memory window registration — requires NCCL >= 2.27.
     ncclWindow_t win;
     NCCL_CHECK(::ncclCommWindowRegister(comm, buf, max_bytes, &win,
                                         NCCL_WIN_COLL_SYMMETRIC));
     m_win = {win, [comm = m_comm](ncclWindow_t w) {
                return NCCL_CHECK(::ncclCommWindowDeregister(comm.get(), w));
              }};
+#endif
   }
 
   auto all_reduce(tvm::ffi::TensorView t, std::string op) const -> void {
     using namespace host;
-    RuntimeCheck(t.device().device_type == kDLCUDA,
+    RuntimeCheck(t.device().device_type == kDLGPU,
                  "Tensor must be on CUDA device");
     RuntimeCheck(t.is_contiguous(), "Tensor must be contiguous");
     const auto size_dim = static_cast<size_t>(t.shape().Product());
@@ -136,10 +145,10 @@ public:
   auto all_gather(tvm::ffi::TensorView dst, tvm::ffi::TensorView src) const
       -> void {
     using namespace host;
-    RuntimeCheck(src.device().device_type == kDLCUDA,
+    RuntimeCheck(src.device().device_type == kDLGPU,
                  "Tensor must be on CUDA device");
     RuntimeCheck(src.is_contiguous(), "Tensor must be contiguous");
-    RuntimeCheck(dst.device().device_type == kDLCUDA,
+    RuntimeCheck(dst.device().device_type == kDLGPU,
                  "Tensor must be on CUDA device");
     RuntimeCheck(dst.is_contiguous(), "Tensor must be contiguous");
     RuntimeCheck(dst.size(0) == src.size(0) * m_world_size,
@@ -171,7 +180,9 @@ private:
   size_t m_max_bytes;
   shared_obj<ncclComm_t> m_comm;
   shared_ptr<void> m_sym_mem;
+#if NCCL_VERSION_CODE >= 22700
   shared_obj<ncclWindow_t> m_win;
+#endif
 };
 
 TVM_FFI_STATIC_INIT_BLOCK() {

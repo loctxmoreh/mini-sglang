@@ -118,6 +118,7 @@ def test_store_cache_device_type_check(device_id: int):
     _require_gpu()
     from minisgl.kernel import store_cache
 
+    torch.cuda.set_device(device_id)
     device = torch.device(f"cuda:{device_id}")
     N, H = 256, 64
     k_cache = torch.zeros(N, H, dtype=torch.float16, device=device)
@@ -173,6 +174,7 @@ def test_store_cache_runs_without_pdl():
     from minisgl.kernel.store import DEFAULT_INDEX_KERNEL_CONFIG, _jit_store_module
 
     assert not DEFAULT_INDEX_KERNEL_CONFIG.use_pdl
+    torch.cuda.set_device(0)
     device = torch.device("cuda:0")
     N, H = 128, 128
     k_cache = torch.zeros(N, H, dtype=torch.float16, device=device)

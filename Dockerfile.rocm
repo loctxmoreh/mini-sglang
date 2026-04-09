@@ -33,7 +33,16 @@ RUN uv venv --python=python${PYTHON_VERSION} /app/.venv \
     && uv pip install torch==2.5.1+rocm6.2 \
         --index-url https://download.pytorch.org/whl/rocm6.2 \
     && uv pip install -e ".[rocm]" \
-    && uv pip install torch-c-dlpack-ext
+    && uv pip install torch-c-dlpack-ext \
+    && python -c "\
+import torch_c_dlpack_ext, os, re; \
+p = os.path.join(os.path.dirname(torch_c_dlpack_ext.__file__), 'core.py'); \
+src = open(p).read(); \
+patched = src.replace(\
+    'suffix = \"cuda\" if torch.cuda.is_available() else \"cpu\"', \
+    'suffix = \"cuda\" if (torch.cuda.is_available() and not getattr(torch.version, \"hip\", None)) else \"cpu\"'); \
+open(p, 'w').write(patched); \
+print('Patched', p)"
 
 # Runtime stage
 FROM rocm/dev-ubuntu-${UBUNTU_VERSION}:${ROCM_VERSION} AS runtime
