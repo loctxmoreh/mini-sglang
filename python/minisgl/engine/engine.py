@@ -235,6 +235,14 @@ def _adjust_config(config: EngineConfig):
         override("page_size", 64)
         logger.warning_rank0("Page size is overridden to 64 for TRTLLM backend")
 
+    # PyTorchBackend contains Python loops and .cpu() calls inside the forward that
+    # cannot be captured by CUDA/HIP graphs.  Disable graph capture unless the user
+    # has explicitly opted in by setting cuda_graph_bs / cuda_graph_max_bs.
+    if config.attention_backend == "pt":
+        if config.cuda_graph_max_bs is None and config.cuda_graph_bs is None:
+            override("cuda_graph_max_bs", 0)
+            logger.info_rank0("CUDA graphs disabled: PyTorchBackend is not graph-capturable")
+
     if config.model_config.is_moe and config.moe_backend == "auto":
         override("moe_backend", "fused")
         logger.info_rank0(f"Auto-selected MoE backend: {config.moe_backend}")
