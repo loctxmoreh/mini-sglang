@@ -9,6 +9,32 @@ import torch
 from .base import StateLessOP
 
 
+def _apply_rope_inplace(
+    positions: torch.Tensor,       # [T] — token positions
+    query: torch.Tensor,           # [T, num_qo_heads, head_dim]
+    key: torch.Tensor,             # [T, num_kv_heads, head_dim]
+    cos_sin_cache: torch.Tensor,   # [max_pos, head_dim] = cat(cos, sin) along last dim
+    head_size: int,
+) -> None:
+    """Apply rotary position embeddings in-place (half-split convention)."""
+    half = head_size // 2
+    # cos/sin: [T, half]
+    cos = cos_sin_cache[positions, :half]
+    sin = cos_sin_cache[positions, half:]
+
+    def _rotate(x: torch.Tensor) -> None:
+        # x: [T, num_heads, head_dim]
+        orig_dtype = x.dtype
+        x_f = x.float()
+        x1, x2 = x_f[..., :half], x_f[..., half:]
+        c = cos[:, None, :]  # [T, 1, half]
+        s = sin[:, None, :]  # [T, 1, half]
+        x.copy_(torch.cat([x1 * c - x2 * s, x1 * s + x2 * c], dim=-1).to(orig_dtype))
+
+    _rotate(query)
+    _rotate(key)
+
+
 class RotaryEmbedding(StateLessOP):
     def __init__(
         self,
@@ -32,23 +58,13 @@ class RotaryEmbedding(StateLessOP):
         self._cos_sin_cache = torch.cat((cos, sin), dim=-1)
         assert self.head_size in [64, 128, 256, 512]
 
-        from flashinfer import apply_rope_with_cos_sin_cache_inplace
-
-        self.apply_rope_with_cos_sin_cache_inplace = apply_rope_with_cos_sin_cache_inplace
-
     def forward(
         self,
         positions: torch.Tensor,
         query: torch.Tensor,
         key: torch.Tensor,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
-        self.apply_rope_with_cos_sin_cache_inplace(
-            positions=positions,
-            query=query,
-            key=key,
-            head_size=self.head_size,
-            cos_sin_cache=self._cos_sin_cache,
-        )
+        _apply_rope_inplace(positions, query, key, self._cos_sin_cache, self.head_size)
         return query, key
 
 

@@ -26,6 +26,13 @@ def create_trtllm_backend(config: ModelConfig):
     return TensorRTLLMBackend(config)
 
 
+@SUPPORTED_ATTENTION_BACKENDS.register("pt")
+def create_pt_backend(config: ModelConfig):
+    from .pt import PyTorchBackend
+
+    return PyTorchBackend(config)
+
+
 @SUPPORTED_ATTENTION_BACKENDS.register("fi")
 def create_fi_backend(config: ModelConfig):
     from .fi import FlashInferBackend

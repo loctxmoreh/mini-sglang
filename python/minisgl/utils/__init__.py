@@ -1,4 +1,4 @@
-from .arch import is_arch_supported, is_sm90_supported, is_sm100_supported
+from .arch import is_arch_supported, is_rocm, is_sm90_supported, is_sm100_supported
 from .hf import cached_load_hf_config, download_hf_weight, load_tokenizer
 from .logger import init_logger
 from .misc import UNSET, Unset, align_ceil, align_down, call_if_main, div_ceil, div_even
@@ -19,6 +19,7 @@ __all__ = [
     "load_tokenizer",
     "init_logger",
     "is_arch_supported",
+    "is_rocm",
     "is_sm90_supported",
     "is_sm100_supported",
     "call_if_main",

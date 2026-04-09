@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, List
 
 import torch
-from minisgl.utils import is_sm90_supported, nvtx_annotate
+from minisgl.utils import nvtx_annotate
 
 if TYPE_CHECKING:
     from minisgl.core import Batch
@@ -14,11 +14,45 @@ if TYPE_CHECKING:
 class BatchSamplingArgs:
     temperatures: torch.Tensor | None
     top_k: torch.Tensor | None = None
-    top_p: torch.Tensor | None = None
+    top_p: torch.Tensor | float | None = None
 
 
 def make_device_tensor(data: List, dtype: torch.dtype, device: torch.device) -> torch.Tensor:
     return torch.tensor(data, dtype=dtype, pin_memory=True).to(device, non_blocking=True)
+
+
+def _softmax_with_temperature(logits: torch.Tensor, temperatures: torch.Tensor) -> torch.Tensor:
+    """temperatures: [batch_size]; logits: [batch_size, vocab_size]."""
+    return torch.softmax(logits / temperatures.unsqueeze(1), dim=-1)
+
+
+def _top_k_top_p_filter(
+    probs: torch.Tensor,
+    top_k: torch.Tensor | None,
+    top_p: torch.Tensor | None,
+) -> torch.Tensor:
+    """
+    Apply top-k and/or top-p filtering to a probability distribution.
+    Returns filtered (and renormalized) probabilities in sorted order along with
+    the corresponding original-vocab indices.
+    """
+    sorted_probs, sorted_indices = torch.sort(probs, dim=-1, descending=True)
+    vocab = probs.size(-1)
+    rank = torch.arange(vocab, device=probs.device).unsqueeze(0)  # [1, vocab]
+
+    if top_k is not None:
+        k = top_k.long().clamp(1, vocab).unsqueeze(1)  # [batch, 1]
+        sorted_probs = sorted_probs.masked_fill(rank >= k, 0.0)
+
+    if top_p is not None:
+        cumprobs = sorted_probs.cumsum(dim=-1)
+        top_p_t = top_p.unsqueeze(1) if isinstance(top_p, torch.Tensor) else top_p
+        # Zero out tokens whose running cumsum already exceeded top_p before them
+        sorted_probs = sorted_probs.masked_fill(cumprobs - sorted_probs > top_p_t, 0.0)
+
+    total = sorted_probs.sum(dim=-1, keepdim=True).clamp(min=1e-8)
+    sorted_probs = sorted_probs / total
+    return sorted_probs, sorted_indices
 
 
 def sample_impl(
@@ -27,22 +61,14 @@ def sample_impl(
     top_k: torch.Tensor | int | None,
     top_p: torch.Tensor | float | None,
 ) -> torch.Tensor:
-    import flashinfer.sampling as sampling
+    probs = _softmax_with_temperature(logits, temperatures)
 
-    probs = sampling.softmax(logits, temperatures, enable_pdl=is_sm90_supported())
     if top_k is None and top_p is None:
-        return sampling.sampling_from_probs(probs)
+        return torch.multinomial(probs, num_samples=1).squeeze(1)
 
-    if top_p is None:
-        assert top_k is not None
-        return sampling.top_k_sampling_from_probs(probs, top_k)
-
-    if top_k is None:
-        assert top_p is not None
-        return sampling.top_p_sampling_from_probs(probs, top_p)
-
-    assert top_k is not None and top_p is not None
-    return sampling.top_k_top_p_sampling_from_probs(probs, top_k, top_p)
+    sorted_probs, sorted_indices = _top_k_top_p_filter(probs, top_k, top_p)
+    sampled = torch.multinomial(sorted_probs, num_samples=1)  # [batch, 1]
+    return sorted_indices.gather(1, sampled).squeeze(1)
 
 
 @dataclass
