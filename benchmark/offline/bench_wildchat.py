@@ -61,6 +61,7 @@ def iter_filtered_prompt_ids(tokenizer):
                 [{"role": "user", "content": prompt}],
                 tokenize=True,
                 add_generation_prompt=True,
+                enable_thinking=False,
             )
             yield ids
 

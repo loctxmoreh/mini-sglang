@@ -66,15 +66,40 @@ def _pt_paged_attn(
         k_sdpa = k_i.transpose(0, 1).unsqueeze(0)   # [1, H, seqlen_k, D]
         v_sdpa = v_i.transpose(0, 1).unsqueeze(0)   # [1, H, seqlen_k, D]
 
-        # is_causal=True generates the right mask for both prefill (seqlen_q ==
-        # seqlen_k) and extend-prefill (seqlen_q < seqlen_k): query token j
-        # attends to key positions <= (seqlen_k - seqlen_q) + j.
-        # For decode (seqlen_q == 1), causal is a no-op but kept for uniformity.
-        out_i = F.scaled_dot_product_attention(
-            q_sdpa, k_sdpa, v_sdpa,
-            scale=softmax_scale,
-            is_causal=True,
-        )  # [1, H, seqlen_q, D]
+        # ROCm SDPA with is_causal=True produces NaN/large errors when
+        # seqlen_q != seqlen_k (non-square attention matrices).  Use explicit
+        # dtype-safe bias instead:
+        #   - decode (seqlen_q == 1): no mask needed — query attends to all keys
+        #   - full prefill (seqlen_q == seqlen_k): is_causal=True is safe
+        #   - extend/chunked prefill: explicit lower-triangular bias
+        if seqlen_q == 1:
+            out_i = F.scaled_dot_product_attention(
+                q_sdpa, k_sdpa, v_sdpa,
+                scale=softmax_scale,
+                is_causal=False,
+            )
+        elif seqlen_q == seqlen_k:
+            out_i = F.scaled_dot_product_attention(
+                q_sdpa, k_sdpa, v_sdpa,
+                scale=softmax_scale,
+                is_causal=True,
+            )
+        else:
+            # Build causal bias: query[i] attends to key[j] iff j <= offset + i
+            offset = seqlen_k - seqlen_q
+            attn_bias = torch.zeros(
+                1, 1, seqlen_q, seqlen_k, device=q_i.device, dtype=q_i.dtype
+            )
+            # Mask out future keys
+            future_mask = torch.ones(seqlen_q, seqlen_k, device=q_i.device, dtype=torch.bool)
+            for qi in range(seqlen_q):
+                future_mask[qi, offset + qi + 1:] = False
+            attn_bias.masked_fill_(~future_mask.unsqueeze(0).unsqueeze(0), float("-inf"))
+            out_i = F.scaled_dot_product_attention(
+                q_sdpa, k_sdpa, v_sdpa,
+                attn_mask=attn_bias,
+                scale=softmax_scale,
+            )
 
         outputs.append(out_i.squeeze(0).transpose(0, 1))  # [seqlen_q, H, D]
 

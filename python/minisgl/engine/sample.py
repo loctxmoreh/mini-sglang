@@ -21,38 +21,26 @@ def make_device_tensor(data: List, dtype: torch.dtype, device: torch.device) -> 
     return torch.tensor(data, dtype=dtype, pin_memory=True).to(device, non_blocking=True)
 
 
-def _softmax_with_temperature(logits: torch.Tensor, temperatures: torch.Tensor) -> torch.Tensor:
-    """temperatures: [batch_size]; logits: [batch_size, vocab_size]."""
-    return torch.softmax(logits / temperatures.unsqueeze(1), dim=-1)
+# Maximum candidates to consider before applying softmax.
+# torch.softmax on the full vocabulary (~151k tokens) requires a 2 MiB HIP
+# workspace allocated via hipMalloc, which fails when physical GPU memory is
+# exhausted (shared-GPU scenarios on ROCm).  By pre-truncating to this limit
+# before the softmax call the workspace stays below ~1 MiB and is serviced from
+# PyTorch's caching allocator instead.
+_MAX_CANDIDATES_BEFORE_SOFTMAX = 50_000
 
 
-def _top_k_top_p_filter(
-    probs: torch.Tensor,
-    top_k: torch.Tensor | None,
-    top_p: torch.Tensor | None,
-) -> torch.Tensor:
+def _gumbel_sample(log_probs: torch.Tensor) -> torch.Tensor:
     """
-    Apply top-k and/or top-p filtering to a probability distribution.
-    Returns filtered (and renormalized) probabilities in sorted order along with
-    the corresponding original-vocab indices.
+    Sample indices from log-probabilities using the Gumbel-max trick.
+
+    Equivalent to `torch.multinomial(exp(log_probs), 1)`.
+    Avoids rocrand / hipMalloc calls that fail when physical GPU memory is
+    exhausted (shared-GPU scenario on ROCm).
     """
-    sorted_probs, sorted_indices = torch.sort(probs, dim=-1, descending=True)
-    vocab = probs.size(-1)
-    rank = torch.arange(vocab, device=probs.device).unsqueeze(0)  # [1, vocab]
-
-    if top_k is not None:
-        k = top_k.long().clamp(1, vocab).unsqueeze(1)  # [batch, 1]
-        sorted_probs = sorted_probs.masked_fill(rank >= k, 0.0)
-
-    if top_p is not None:
-        cumprobs = sorted_probs.cumsum(dim=-1)
-        top_p_t = top_p.unsqueeze(1) if isinstance(top_p, torch.Tensor) else top_p
-        # Zero out tokens whose running cumsum already exceeded top_p before them
-        sorted_probs = sorted_probs.masked_fill(cumprobs - sorted_probs > top_p_t, 0.0)
-
-    total = sorted_probs.sum(dim=-1, keepdim=True).clamp(min=1e-8)
-    sorted_probs = sorted_probs / total
-    return sorted_probs, sorted_indices
+    # Gumbel(0,1) = -log(-log(U)) = -log(Exponential(1))
+    gumbel = log_probs.new_empty(log_probs.shape).exponential_(1.0).log_().neg_()
+    return torch.argmax(log_probs + gumbel, dim=-1)
 
 
 def sample_impl(
@@ -61,14 +49,47 @@ def sample_impl(
     top_k: torch.Tensor | int | None,
     top_p: torch.Tensor | float | None,
 ) -> torch.Tensor:
-    probs = _softmax_with_temperature(logits, temperatures)
+    scaled = logits / temperatures.unsqueeze(1)  # [B, vocab]
+    vocab = scaled.size(-1)
 
     if top_k is None and top_p is None:
-        return torch.multinomial(probs, num_samples=1).squeeze(1)
+        # No filtering: Gumbel-max directly on scaled logits avoids any softmax
+        # hipMalloc workspace.  argmax(logits/T + Gumbel) is exactly equivalent
+        # to sampling from softmax(logits/T).
+        gumbel = scaled.new_empty(scaled.shape).exponential_(1.0).log_().neg_()
+        return torch.argmax(scaled + gumbel, dim=-1)
 
-    sorted_probs, sorted_indices = _top_k_top_p_filter(probs, top_k, top_p)
-    sampled = torch.multinomial(sorted_probs, num_samples=1)  # [batch, 1]
-    return sorted_indices.gather(1, sampled).squeeze(1)
+    # --- top-k / top-p path ---
+    # Pre-truncate to _MAX_CANDIDATES_BEFORE_SOFTMAX so that the softmax
+    # workspace (≈3× tensor bytes) stays well below 2 MiB.
+    max_candidates = _MAX_CANDIDATES_BEFORE_SOFTMAX
+    if top_k is not None:
+        k_max = int(top_k.max().item()) if isinstance(top_k, torch.Tensor) else int(top_k)
+        max_candidates = min(max_candidates, k_max)
+    max_candidates = min(max_candidates, vocab)
+
+    # topk returns (values, indices) sorted descending
+    topk_logits, topk_indices = torch.topk(scaled, max_candidates, dim=-1, sorted=True)
+
+    # Compute probabilities only over the candidate set (small softmax, no OOM)
+    topk_probs = torch.softmax(topk_logits, dim=-1)  # [B, max_candidates]
+
+    rank = torch.arange(max_candidates, device=scaled.device).unsqueeze(0)  # [1, C]
+
+    if top_k is not None:
+        k = top_k.long().clamp(1, max_candidates).unsqueeze(1)  # [B, 1]
+        topk_probs = topk_probs.masked_fill(rank >= k, 0.0)
+
+    if top_p is not None:
+        cumprobs = topk_probs.cumsum(dim=-1)
+        top_p_t = top_p.unsqueeze(1) if isinstance(top_p, torch.Tensor) else top_p
+        topk_probs = topk_probs.masked_fill(cumprobs - topk_probs > top_p_t, 0.0)
+
+    total = topk_probs.sum(dim=-1, keepdim=True).clamp(min=1e-8)
+    topk_probs = topk_probs / total
+
+    sampled = _gumbel_sample(topk_probs.log()).unsqueeze(1)  # [B, 1]
+    return topk_indices.gather(1, sampled).squeeze(1)
 
 
 @dataclass

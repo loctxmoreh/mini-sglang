@@ -158,7 +158,19 @@ class Engine:
         num_pages = config.num_page_override
         if num_pages is None:
             model_memory = old_free_memory - new_free_memory
-            available_memory = int(config.memory_ratio * old_free_memory) - model_memory
+            # memory_ratio-based budget
+            budget = int(config.memory_ratio * old_free_memory) - model_memory
+            # Always leave MIN_HEADROOM_BYTES of physical GPU memory free for
+            # Triton / TVM hipMalloc workspace allocations that happen during the
+            # forward pass.  Without this, those calls fail on shared GPUs and
+            # corrupt the HIP error state, causing every subsequent kernel launch
+            # (including sampling) to report "no kernel image available".
+            # 512 MiB is enough for typical Triton workspace sizes; on a large
+            # dedicated GPU the cap never activates because ratio_budget is smaller
+            # than the headroom limit.
+            MIN_HEADROOM_BYTES = 1024 * 1024 * 1024  # 1 GiB
+            headroom_budget = old_free_memory - model_memory - MIN_HEADROOM_BYTES
+            available_memory = min(budget, headroom_budget)
             num_pages = available_memory // cache_per_page
 
         assert num_pages > 1, "Not enough memory for KV cache, try reducing --num-pages"

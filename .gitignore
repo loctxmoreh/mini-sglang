@@ -34,3 +34,4 @@ env/
 
 # uv lock file (platform-specific; not committed)
 uv.lock
+*.parquet
