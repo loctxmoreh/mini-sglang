@@ -7,7 +7,7 @@ name = "minisgl"
 version = "0.1.0"
 description = "What is this?"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.13"
 license = {text = "MIT"}
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -37,14 +37,20 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# CUDA-only kernels — install with:  uv pip install -e ".[cuda]"
+# CUDA build — torch resolves from pytorch-cu128 (see [tool.uv.sources] below).
 cuda = [
+    "torch<2.10.0",
     "flashinfer-python>=0.5.3",
     "sgl_kernel>=0.3.17.post1",
     "quack-kernels",
 ]
-# ROCm placeholder — grows as kernel replacements are added during porting
-rocm = []
+# ROCm 6.2 build — torch resolves from pytorch-rocm62 (see [tool.uv.sources]
+# below). The rocm6.2 wheel index only ships torch 2.5.x, hence the pin.
+# Grows as kernel replacements are added during porting.
+rocm = [
+    "torch==2.5.1",
+    "pytorch-triton-rocm==3.1.0",
+]
 dev = [
     "pytest>=6.0",
     "pytest-cov>=2.0",
@@ -146,17 +152,16 @@ module = [
 ignore_missing_imports = true
 
 # ---------------------------------------------------------------------------
-# uv — named wheel indexes
-# These are declared for reference and explicit use via --index-url flags.
-# See scripts/dev-setup.sh and Dockerfile.rocm for the install commands.
+# uv — named wheel indexes and platform-dependent torch sources
 #
-# CUDA (default — torch resolves from PyPI):
-#   uv pip install -e ".[cuda,dev]"
+# The torch wheel is selected by which extra is active; cuda and rocm are
+# declared as conflicting extras so uv produces one lock covering both.
 #
-# ROCm 6.2 (two-step: install torch first, then the package):
-#   uv pip install torch==2.5.1+rocm6.2 \
-#       --index-url https://download.pytorch.org/whl/rocm6.2
-#   uv pip install -e ".[rocm,dev]"
+# CUDA:
+#   uv sync --extra cuda --extra dev
+#
+# ROCm 6.2:
+#   uv sync --extra rocm --extra dev
 
 [[tool.uv.index]]
 name     = "pytorch-rocm62"
@@ -167,3 +172,22 @@ explicit = true
 name     = "pytorch-cu128"
 url      = "https://download.pytorch.org/whl/cu128"
 explicit = true
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu128", extra = "cuda" },
+    { index = "pytorch-rocm62", extra = "rocm" },
+]
+# torch==2.5.1+rocm6.2 pulls in pytorch-triton-rocm==3.1.0 transitively;
+# route that lookup to the same ROCm index (it is not on PyPI).
+pytorch-triton-rocm = [
+    { index = "pytorch-rocm62", extra = "rocm" },
+]
+
+[tool.uv]
+conflicts = [
+    [
+        { extra = "cuda" },
+        { extra = "rocm" },
+    ],
+]
