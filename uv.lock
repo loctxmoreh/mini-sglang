@@ -9,6 +9,7 @@ resolution-markers = [
 conflicts = [[
     { package = "minisgl", extra = "cuda" },
     { package = "minisgl", extra = "rocm" },
+    { package = "minisgl", extra = "rocm70" },
 ]]
 
 [[package]]
@@ -17,15 +18,16 @@ version = "1.13.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "huggingface-hub" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
     { name = "packaging" },
     { name = "psutil" },
     { name = "pyyaml" },
     { name = "safetensors" },
-    { name = "torch", version = "2.5.1+rocm6.2", source = { registry = "https://download.pytorch.org/whl/rocm6.2" }, marker = "extra == 'extra-7-minisgl-rocm'" },
-    { name = "torch", version = "2.9.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm')" },
-    { name = "torch", version = "2.9.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "extra == 'extra-7-minisgl-cuda'" },
+    { name = "torch", version = "2.5.1+rocm6.2", source = { registry = "https://download.pytorch.org/whl/rocm6.2" }, marker = "extra == 'extra-7-minisgl-rocm' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "torch", version = "2.9.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70')" },
+    { name = "torch", version = "2.9.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "extra == 'extra-7-minisgl-cuda' or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "torch", version = "2.10.0+rocm7.0", source = { registry = "https://download.pytorch.org/whl/rocm7.0" }, marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra != 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ca/14/787e5498cd062640f0f3d92ef4ae4063174f76f9afd29d13fc52a319daae/accelerate-1.13.0.tar.gz", hash = "sha256:d631b4e0f5b3de4aff2d7e9e6857d164810dfc3237d54d017f075122d057b236", size = 402835, upload-time = "2026-03-04T19:34:12.359Z" }
 wheels = [
@@ -55,7 +57,7 @@ name = "anyio"
 version = "4.13.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "exceptiongroup", marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "exceptiongroup", marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
     { name = "idna" },
     { name = "typing-extensions" },
 ]
@@ -104,8 +106,8 @@ dependencies = [
     { name = "pathspec" },
     { name = "platformdirs" },
     { name = "pytokens" },
-    { name = "tomli", marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "typing-extensions", marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "tomli", marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/e1/c5/61175d618685d42b005847464b8fb4743a67b1b8fdb75e50e5a96c31a27a/black-26.3.1.tar.gz", hash = "sha256:2c50f5063a9641c7eed7795014ba37b0f5fa227f3d408b968936e24bc0566b07", size = 666155, upload-time = "2026-03-12T03:36:03.593Z" }
 wheels = [
@@ -141,7 +143,7 @@ name = "cffi"
 version = "2.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pycparser", marker = "implementation_name != 'PyPy' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "pycparser", marker = "implementation_name != 'PyPy' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/eb/56/b1ba7935a17738ae8453301356628e8147c79dbb825bcbc73dc7401f9846/cffi-2.0.0.tar.gz", hash = "sha256:44d1b5909021139fe36001ae048dbdde8214afa20200eda0f64c068cac5d5529", size = 523588, upload-time = "2025-09-08T23:24:04.541Z" }
 wheels = [
@@ -255,7 +257,7 @@ name = "click"
 version = "8.3.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/57/75/31212c6bf2503fdf920d87fee5d7a86a2e3bcf444984126f13d8e4016804/click-8.3.2.tar.gz", hash = "sha256:14162b8b3b3550a7d479eafa77dfd3c38d9dc8951f6f69c78913a8f9a7540fd5", size = 302856, upload-time = "2026-04-03T19:14:45.118Z" }
 wheels = [
@@ -279,7 +281,7 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/66/54/eb9bfc647b19f2009dd5c7f5ec51c4e6ca831725f1aea7a993034f483147/contourpy-1.3.2.tar.gz", hash = "sha256:b6945942715a034c671b7fc54f9588126b0b8bf23db2696e3ca8328f3ff0ab54", size = 13466130, upload-time = "2025-04-15T17:47:53.79Z" }
 wheels = [
@@ -330,7 +332,7 @@ resolution-markers = [
     "python_full_version == '3.11.*'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/58/01/1253e6698a07380cd31a736d248a3f2a50a7c88779a1813da27503cadc2a/contourpy-1.3.3.tar.gz", hash = "sha256:083e12155b210502d0bca491432bb04d56dc3432f95a979b429f2848c3dbe880", size = 13466174, upload-time = "2025-07-26T12:03:12.549Z" }
 wheels = [
@@ -418,7 +420,7 @@ wheels = [
 
 [package.optional-dependencies]
 toml = [
-    { name = "tomli", marker = "python_full_version <= '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "tomli", marker = "python_full_version <= '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
 ]
 
 [[package]]
@@ -520,7 +522,7 @@ name = "exceptiongroup"
 version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.12' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.12' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/50/79/66800aadf48771f6b62f7eb014e352e5d06856655206165d775e675a02c9/exceptiongroup-1.3.1.tar.gz", hash = "sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219", size = 30371, upload-time = "2025-11-21T23:01:54.787Z" }
 wheels = [
@@ -576,8 +578,8 @@ dependencies = [
     { name = "cuda-tile" },
     { name = "einops" },
     { name = "ninja" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
     { name = "nvidia-cudnn-frontend" },
     { name = "nvidia-cutlass-dsl" },
     { name = "nvidia-ml-py" },
@@ -694,7 +696,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "filelock" },
     { name = "fsspec" },
-    { name = "hf-xet", marker = "platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'arm64' or platform_machine == 'x86_64' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "hf-xet", marker = "platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'arm64' or platform_machine == 'x86_64' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
     { name = "packaging" },
     { name = "pyyaml" },
     { name = "requests" },
@@ -959,13 +961,13 @@ name = "matplotlib"
 version = "3.10.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "contourpy", version = "1.3.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "contourpy", version = "1.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "contourpy", version = "1.3.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "contourpy", version = "1.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
     { name = "cycler" },
     { name = "fonttools" },
     { name = "kiwisolver" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
     { name = "packaging" },
     { name = "pillow" },
     { name = "pyparsing" },
@@ -1023,9 +1025,10 @@ dependencies = [
     { name = "openai" },
     { name = "prompt-toolkit" },
     { name = "pyzmq" },
-    { name = "torch", version = "2.5.1+rocm6.2", source = { registry = "https://download.pytorch.org/whl/rocm6.2" }, marker = "extra == 'extra-7-minisgl-rocm'" },
-    { name = "torch", version = "2.9.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm')" },
-    { name = "torch", version = "2.9.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "extra == 'extra-7-minisgl-cuda'" },
+    { name = "torch", version = "2.5.1+rocm6.2", source = { registry = "https://download.pytorch.org/whl/rocm6.2" }, marker = "extra == 'extra-7-minisgl-rocm' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "torch", version = "2.9.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70')" },
+    { name = "torch", version = "2.9.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "extra == 'extra-7-minisgl-cuda' or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "torch", version = "2.10.0+rocm7.0", source = { registry = "https://download.pytorch.org/whl/rocm7.0" }, marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra != 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
     { name = "torch-c-dlpack-ext" },
     { name = "transformers" },
     { name = "uvicorn" },
@@ -1053,6 +1056,10 @@ rocm = [
     { name = "pytorch-triton-rocm" },
     { name = "torch", version = "2.5.1+rocm6.2", source = { registry = "https://download.pytorch.org/whl/rocm6.2" } },
 ]
+rocm70 = [
+    { name = "torch", version = "2.10.0+rocm7.0", source = { registry = "https://download.pytorch.org/whl/rocm7.0" } },
+    { name = "triton-rocm" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -1077,14 +1084,16 @@ requires-dist = [
     { name = "quack-kernels", marker = "extra == 'cuda'" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.11.0" },
     { name = "sgl-kernel", marker = "extra == 'cuda'", specifier = ">=0.3.17.post1" },
-    { name = "torch", specifier = "<2.10.0" },
+    { name = "torch" },
     { name = "torch", marker = "extra == 'cuda'", specifier = "<2.10.0", index = "https://download.pytorch.org/whl/cu128", conflict = { package = "minisgl", extra = "cuda" } },
     { name = "torch", marker = "extra == 'rocm'", specifier = "==2.5.1", index = "https://download.pytorch.org/whl/rocm6.2", conflict = { package = "minisgl", extra = "rocm" } },
+    { name = "torch", marker = "extra == 'rocm70'", specifier = "==2.10.0", index = "https://download.pytorch.org/whl/rocm7.0", conflict = { package = "minisgl", extra = "rocm70" } },
     { name = "torch-c-dlpack-ext" },
     { name = "transformers", specifier = ">=4.56.0,<=4.57.3" },
+    { name = "triton-rocm", marker = "extra == 'rocm70'", specifier = "==3.6.0", index = "https://download.pytorch.org/whl/rocm7.0", conflict = { package = "minisgl", extra = "rocm70" } },
     { name = "uvicorn" },
 ]
-provides-extras = ["cuda", "rocm", "dev"]
+provides-extras = ["cuda", "rocm", "rocm70", "dev"]
 
 [[package]]
 name = "modelscope"
@@ -1151,10 +1160,10 @@ name = "mypy"
 version = "1.20.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "librt", marker = "platform_python_implementation != 'PyPy' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "librt", marker = "platform_python_implementation != 'PyPy' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
     { name = "mypy-extensions" },
     { name = "pathspec" },
-    { name = "tomli", marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "tomli", marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
     { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0b/3d/5b373635b3146264eb7a68d09e5ca11c305bbb058dfffbb47c47daf4f632/mypy-1.20.1.tar.gz", hash = "sha256:6fc3f4ecd52de81648fed1945498bf42fa2993ddfad67c9056df36ae5757f804", size = 3815892, upload-time = "2026-04-13T02:46:51.474Z" }
@@ -1383,7 +1392,7 @@ name = "nvidia-cudnn-cu12"
 version = "9.10.2.21"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-cublas-cu12", marker = "extra == 'extra-7-minisgl-cuda' or extra != 'extra-7-minisgl-rocm'" },
+    { name = "nvidia-cublas-cu12", marker = "extra == 'extra-7-minisgl-cuda' or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/fa/41/e79269ce215c857c935fd86bcfe91a451a584dfc27f1e068f568b9ad1ab7/nvidia_cudnn_cu12-9.10.2.21-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:c9132cc3f8958447b4910a1720036d9eff5928cc3179b0a51fb6d167c6cc87d8", size = 705026878, upload-time = "2025-06-06T21:52:51.348Z" },
@@ -1412,7 +1421,7 @@ name = "nvidia-cufft-cu12"
 version = "11.3.3.83"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-nvjitlink-cu12", marker = "extra == 'extra-7-minisgl-cuda' or extra != 'extra-7-minisgl-rocm'" },
+    { name = "nvidia-nvjitlink-cu12", marker = "extra == 'extra-7-minisgl-cuda' or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/60/bc/7771846d3a0272026c416fbb7e5f4c1f146d6d80704534d0b187dd6f4800/nvidia_cufft_cu12-11.3.3.83-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:848ef7224d6305cdb2a4df928759dca7b1201874787083b6e7550dd6765ce69a", size = 193109211, upload-time = "2025-03-07T01:44:56.873Z" },
@@ -1444,9 +1453,9 @@ name = "nvidia-cusolver-cu12"
 version = "11.7.3.90"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-cublas-cu12", marker = "extra == 'extra-7-minisgl-cuda' or extra != 'extra-7-minisgl-rocm'" },
-    { name = "nvidia-cusparse-cu12", marker = "extra == 'extra-7-minisgl-cuda' or extra != 'extra-7-minisgl-rocm'" },
-    { name = "nvidia-nvjitlink-cu12", marker = "extra == 'extra-7-minisgl-cuda' or extra != 'extra-7-minisgl-rocm'" },
+    { name = "nvidia-cublas-cu12", marker = "extra == 'extra-7-minisgl-cuda' or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cusparse-cu12", marker = "extra == 'extra-7-minisgl-cuda' or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-nvjitlink-cu12", marker = "extra == 'extra-7-minisgl-cuda' or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c8/32/f7cd6ce8a7690544d084ea21c26e910a97e077c9b7f07bf5de623ee19981/nvidia_cusolver_cu12-11.7.3.90-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:db9ed69dbef9715071232caa9b69c52ac7de3a95773c2db65bdba85916e4e5c0", size = 267229841, upload-time = "2025-03-07T01:46:54.356Z" },
@@ -1459,7 +1468,7 @@ name = "nvidia-cusparse-cu12"
 version = "12.5.8.93"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-nvjitlink-cu12", marker = "extra == 'extra-7-minisgl-cuda' or extra != 'extra-7-minisgl-rocm'" },
+    { name = "nvidia-nvjitlink-cu12", marker = "extra == 'extra-7-minisgl-cuda' or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/bc/f7/cd777c4109681367721b00a106f491e0d0d15cfa1fd59672ce580ce42a97/nvidia_cusparse_cu12-12.5.8.93-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:9b6c161cb130be1a07a27ea6923df8141f3c295852f4b260c65f18f3e0a091dc", size = 288117129, upload-time = "2025-03-07T01:47:40.407Z" },
@@ -1494,8 +1503,8 @@ version = "4.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cuda-python" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
     { name = "typing-extensions" },
 ]
 wheels = [
@@ -1871,13 +1880,13 @@ name = "pytest"
 version = "9.0.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "exceptiongroup", marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "exceptiongroup", marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
     { name = "iniconfig" },
     { name = "packaging" },
     { name = "pluggy" },
     { name = "pygments" },
-    { name = "tomli", marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "tomli", marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/7d/0d/549bd94f1a0a402dc8cf64563a117c0f3765662e2e668477624baeec44d5/pytest-9.0.3.tar.gz", hash = "sha256:b86ada508af81d19edeb213c681b1d48246c1a91d304c6c81a427674c17eb91c", size = 1572165, upload-time = "2026-04-07T17:16:18.027Z" }
 wheels = [
@@ -1952,12 +1961,12 @@ name = "pytorch-triton-rocm"
 version = "3.1.0"
 source = { registry = "https://download.pytorch.org/whl/rocm6.2" }
 dependencies = [
-    { name = "filelock", marker = "extra == 'extra-7-minisgl-rocm'" },
+    { name = "filelock", marker = "extra == 'extra-7-minisgl-rocm' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
 ]
 wheels = [
-    { url = "https://download-r2.pytorch.org/whl/pytorch_triton_rocm-3.1.0-cp310-cp310-linux_x86_64.whl", hash = "sha256:328592189d7f7bbebdfdcb806c02970977f124d756e7915ff8ff8493f2d12802" },
-    { url = "https://download-r2.pytorch.org/whl/pytorch_triton_rocm-3.1.0-cp311-cp311-linux_x86_64.whl", hash = "sha256:4b0a563986aa591ecbbfd69d53f171447f64ba453cecaafd80d853b3f1047eca" },
-    { url = "https://download-r2.pytorch.org/whl/pytorch_triton_rocm-3.1.0-cp312-cp312-linux_x86_64.whl", hash = "sha256:3b56b87886d03dcf3aeb8f78f372f5da60b29ffdffcba5cd767b4bfdec47175b" },
+    { url = "https://download-r2.pytorch.org/whl/pytorch_triton_rocm-3.1.0-cp310-cp310-linux_x86_64.whl", hash = "sha256:328592189d7f7bbebdfdcb806c02970977f124d756e7915ff8ff8493f2d12802", upload-time = "2024-10-17T22:54:32Z" },
+    { url = "https://download-r2.pytorch.org/whl/pytorch_triton_rocm-3.1.0-cp311-cp311-linux_x86_64.whl", hash = "sha256:4b0a563986aa591ecbbfd69d53f171447f64ba453cecaafd80d853b3f1047eca", upload-time = "2024-10-17T22:54:41Z" },
+    { url = "https://download-r2.pytorch.org/whl/pytorch_triton_rocm-3.1.0-cp312-cp312-linux_x86_64.whl", hash = "sha256:3b56b87886d03dcf3aeb8f78f372f5da60b29ffdffcba5cd767b4bfdec47175b", upload-time = "2024-10-17T22:54:50Z" },
 ]
 
 [[package]]
@@ -2001,7 +2010,7 @@ name = "pyzmq"
 version = "27.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "cffi", marker = "implementation_name == 'pypy' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "cffi", marker = "implementation_name == 'pypy' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/04/0b/3c9baedbdf613ecaa7aa07027780b8867f57b6293b6ee50de316c9f3222b/pyzmq-27.1.0.tar.gz", hash = "sha256:ac0765e3d44455adb6ddbf4417dcce460fc40a05978c08efdf2948072f6db540", size = 281750, upload-time = "2025-09-08T23:10:18.157Z" }
 wheels = [
@@ -2244,7 +2253,7 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "mpmath", marker = "extra == 'extra-7-minisgl-rocm'" },
+    { name = "mpmath", marker = "extra == 'extra-7-minisgl-rocm' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ca/99/5a5b6f19ff9f083671ddf7b9632028436167cd3d33e11015754e41b249a4/sympy-1.13.1.tar.gz", hash = "sha256:9cebf7e04ff162015ce31c9c6c9144daa34a93bd082f54fd8f12deca4f47515f", size = 7533040, upload-time = "2024-07-19T09:26:51.238Z" }
 wheels = [
@@ -2261,7 +2270,7 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "mpmath", marker = "extra == 'extra-7-minisgl-cuda' or extra != 'extra-7-minisgl-rocm'" },
+    { name = "mpmath", marker = "extra == 'extra-7-minisgl-cuda' or extra != 'extra-7-minisgl-rocm' or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/83/d3/803453b36afefb7c2bb238361cd4ae6125a569b4db67cd9e79846ba2d68c/sympy-1.14.0.tar.gz", hash = "sha256:d3d3fe8df1e5a0b42f0e7bdf50541697dbe7d23746e894990c030e2b05e72517", size = 7793921, upload-time = "2025-04-27T18:05:01.611Z" }
 wheels = [
@@ -2344,20 +2353,20 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "filelock", marker = "extra == 'extra-7-minisgl-rocm'" },
-    { name = "fsspec", marker = "extra == 'extra-7-minisgl-rocm'" },
-    { name = "jinja2", marker = "extra == 'extra-7-minisgl-rocm'" },
-    { name = "networkx", version = "3.4.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "pytorch-triton-rocm", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-7-minisgl-rocm') or (platform_machine != 'x86_64' and extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (sys_platform != 'linux' and extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "setuptools", marker = "(python_full_version >= '3.12' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "sympy", version = "1.13.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-7-minisgl-rocm'" },
-    { name = "typing-extensions", marker = "extra == 'extra-7-minisgl-rocm'" },
+    { name = "filelock", marker = "extra == 'extra-7-minisgl-rocm' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "fsspec", marker = "extra == 'extra-7-minisgl-rocm' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "jinja2", marker = "extra == 'extra-7-minisgl-rocm' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "networkx", version = "3.4.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "pytorch-triton-rocm", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'extra-7-minisgl-rocm') or (platform_machine != 'x86_64' and extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (sys_platform != 'linux' and extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "setuptools", marker = "(python_full_version >= '3.12' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "sympy", version = "1.13.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-7-minisgl-rocm' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "typing-extensions", marker = "extra == 'extra-7-minisgl-rocm' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
 ]
 wheels = [
-    { url = "https://download-r2.pytorch.org/whl/rocm6.2/torch-2.5.1%2Brocm6.2-cp310-cp310-linux_x86_64.whl", hash = "sha256:c76e18da9e49b5d6f3cc607bc9d41a905425ab0bb2a75c9d2ba06989ccd9a300" },
-    { url = "https://download-r2.pytorch.org/whl/rocm6.2/torch-2.5.1%2Brocm6.2-cp311-cp311-linux_x86_64.whl", hash = "sha256:9c4c4d985923d0e31aab4108c56a1586ca599ab26abc919833b890f7f40dcc01" },
-    { url = "https://download-r2.pytorch.org/whl/rocm6.2/torch-2.5.1%2Brocm6.2-cp312-cp312-linux_x86_64.whl", hash = "sha256:80c7af931acb3941530a717aaa1d142985ae7f29b7660a72e47f1a890fc191fb" },
+    { url = "https://download-r2.pytorch.org/whl/rocm6.2/torch-2.5.1%2Brocm6.2-cp310-cp310-linux_x86_64.whl", hash = "sha256:c76e18da9e49b5d6f3cc607bc9d41a905425ab0bb2a75c9d2ba06989ccd9a300", upload-time = "2024-10-29T23:57:01Z" },
+    { url = "https://download-r2.pytorch.org/whl/rocm6.2/torch-2.5.1%2Brocm6.2-cp311-cp311-linux_x86_64.whl", hash = "sha256:9c4c4d985923d0e31aab4108c56a1586ca599ab26abc919833b890f7f40dcc01", upload-time = "2024-10-29T23:59:56Z" },
+    { url = "https://download-r2.pytorch.org/whl/rocm6.2/torch-2.5.1%2Brocm6.2-cp312-cp312-linux_x86_64.whl", hash = "sha256:80c7af931acb3941530a717aaa1d142985ae7f29b7660a72e47f1a890fc191fb", upload-time = "2024-10-30T00:03:16Z" },
 ]
 
 [[package]]
@@ -2370,30 +2379,30 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "filelock", marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm')" },
-    { name = "fsspec", marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm')" },
-    { name = "jinja2", marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm')" },
-    { name = "networkx", version = "3.4.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-cublas-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-cuda-cupti-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-cuda-nvrtc-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-cuda-runtime-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-cudnn-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-cufft-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-cufile-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-curand-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-cusolver-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-cusparse-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-cusparselt-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-nccl-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-nvjitlink-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-nvshmem-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-nvtx-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "setuptools", marker = "(python_full_version >= '3.12' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "sympy", version = "1.14.0", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm')" },
-    { name = "triton", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "typing-extensions", marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm')" },
+    { name = "filelock", marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70')" },
+    { name = "fsspec", marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70')" },
+    { name = "jinja2", marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70')" },
+    { name = "networkx", version = "3.4.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cublas-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cuda-cupti-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cuda-nvrtc-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cuda-runtime-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cudnn-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cufft-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cufile-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-curand-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cusolver-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cusparse-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cusparselt-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-nccl-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-nvjitlink-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-nvshmem-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-nvtx-cu12", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "setuptools", marker = "(python_full_version >= '3.12' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "sympy", version = "1.14.0", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70')" },
+    { name = "triton", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "typing-extensions", marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/5f/56/9577683b23072075ed2e40d725c52c2019d71a972fab8e083763da8e707e/torch-2.9.1-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:1cc208435f6c379f9b8fdfd5ceb5be1e3b72a6bdf1cb46c0d2812aa73472db9e", size = 104207681, upload-time = "2025-11-12T15:19:56.48Z" },
@@ -2420,41 +2429,67 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "filelock", marker = "extra == 'extra-7-minisgl-cuda'" },
-    { name = "fsspec", marker = "extra == 'extra-7-minisgl-cuda'" },
-    { name = "jinja2", marker = "extra == 'extra-7-minisgl-cuda'" },
-    { name = "networkx", version = "3.4.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-cublas-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-cuda-cupti-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-cuda-nvrtc-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-cuda-runtime-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-cudnn-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-cufft-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-cufile-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-curand-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-cusolver-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-cusparse-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-cusparselt-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-nccl-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-nvjitlink-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-nvshmem-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "nvidia-nvtx-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "setuptools", marker = "(python_full_version >= '3.12' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "sympy", version = "1.14.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-7-minisgl-cuda'" },
-    { name = "triton", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "typing-extensions", marker = "extra == 'extra-7-minisgl-cuda'" },
+    { name = "filelock", marker = "extra == 'extra-7-minisgl-cuda' or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "fsspec", marker = "extra == 'extra-7-minisgl-cuda' or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "jinja2", marker = "extra == 'extra-7-minisgl-cuda' or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "networkx", version = "3.4.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cublas-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cuda-cupti-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cuda-nvrtc-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cuda-runtime-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cudnn-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cufft-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cufile-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-curand-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cusolver-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cusparse-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-cusparselt-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-nccl-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-nvjitlink-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-nvshmem-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "nvidia-nvtx-cu12", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "setuptools", marker = "(python_full_version >= '3.12' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "sympy", version = "1.14.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-7-minisgl-cuda' or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "triton", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-cuda') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "typing-extensions", marker = "extra == 'extra-7-minisgl-cuda' or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
 ]
 wheels = [
-    { url = "https://download-r2.pytorch.org/whl/cu128/torch-2.9.1%2Bcu128-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:72f0f096475e8095a6bea3fba75bd3b46cf42c761b29588f7599314e67a32661" },
-    { url = "https://download-r2.pytorch.org/whl/cu128/torch-2.9.1%2Bcu128-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:c8d670aa0be6fbecd2b0e7b7d514a104dbdefcc3786ca446cf0c3415043ea40a" },
-    { url = "https://download-r2.pytorch.org/whl/cu128/torch-2.9.1%2Bcu128-cp310-cp310-win_amd64.whl", hash = "sha256:64399adaa8ea0896d02cf844cba3c5dd77e769520a1af73572599e0eaa2cf551" },
-    { url = "https://download-r2.pytorch.org/whl/cu128/torch-2.9.1%2Bcu128-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:cf4ad82430824a80a9f398e29369524ed26c152cf00c2c12002e5400b35e260d" },
-    { url = "https://download-r2.pytorch.org/whl/cu128/torch-2.9.1%2Bcu128-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:2a1da940f0757621d098c9755f7504d791a72a40920ec85a4fd98b20253fca4e" },
-    { url = "https://download-r2.pytorch.org/whl/cu128/torch-2.9.1%2Bcu128-cp311-cp311-win_amd64.whl", hash = "sha256:633005a3700e81b5be0df2a7d3c1d48aced23ed927653797a3bd2b144a3aeeb6" },
-    { url = "https://download-r2.pytorch.org/whl/cu128/torch-2.9.1%2Bcu128-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:1176f250311fa95cc3bca8077af323e0d73ea385ba266e096af82e7e2b91f256" },
-    { url = "https://download-r2.pytorch.org/whl/cu128/torch-2.9.1%2Bcu128-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:7cb4018f4ce68b61fd3ef87dc1c4ca520731c7b5b200e360ad47b612d7844063" },
-    { url = "https://download-r2.pytorch.org/whl/cu128/torch-2.9.1%2Bcu128-cp312-cp312-win_amd64.whl", hash = "sha256:3a01f0b64c10a82d444d9fd06b3e8c567b1158b76b2764b8f51bfd8f535064b0" },
+    { url = "https://download-r2.pytorch.org/whl/cu128/torch-2.9.1%2Bcu128-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:72f0f096475e8095a6bea3fba75bd3b46cf42c761b29588f7599314e67a32661", upload-time = "2026-01-26T16:53:51Z" },
+    { url = "https://download-r2.pytorch.org/whl/cu128/torch-2.9.1%2Bcu128-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:c8d670aa0be6fbecd2b0e7b7d514a104dbdefcc3786ca446cf0c3415043ea40a", upload-time = "2026-01-26T16:53:51Z" },
+    { url = "https://download-r2.pytorch.org/whl/cu128/torch-2.9.1%2Bcu128-cp310-cp310-win_amd64.whl", hash = "sha256:64399adaa8ea0896d02cf844cba3c5dd77e769520a1af73572599e0eaa2cf551", upload-time = "2026-01-26T16:53:51Z" },
+    { url = "https://download-r2.pytorch.org/whl/cu128/torch-2.9.1%2Bcu128-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:cf4ad82430824a80a9f398e29369524ed26c152cf00c2c12002e5400b35e260d", upload-time = "2026-01-26T16:53:53Z" },
+    { url = "https://download-r2.pytorch.org/whl/cu128/torch-2.9.1%2Bcu128-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:2a1da940f0757621d098c9755f7504d791a72a40920ec85a4fd98b20253fca4e", upload-time = "2026-01-26T16:53:57Z" },
+    { url = "https://download-r2.pytorch.org/whl/cu128/torch-2.9.1%2Bcu128-cp311-cp311-win_amd64.whl", hash = "sha256:633005a3700e81b5be0df2a7d3c1d48aced23ed927653797a3bd2b144a3aeeb6", upload-time = "2026-01-26T16:54:12Z" },
+    { url = "https://download-r2.pytorch.org/whl/cu128/torch-2.9.1%2Bcu128-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:1176f250311fa95cc3bca8077af323e0d73ea385ba266e096af82e7e2b91f256", upload-time = "2026-01-26T16:54:14Z" },
+    { url = "https://download-r2.pytorch.org/whl/cu128/torch-2.9.1%2Bcu128-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:7cb4018f4ce68b61fd3ef87dc1c4ca520731c7b5b200e360ad47b612d7844063", upload-time = "2026-01-26T16:54:25Z" },
+    { url = "https://download-r2.pytorch.org/whl/cu128/torch-2.9.1%2Bcu128-cp312-cp312-win_amd64.whl", hash = "sha256:3a01f0b64c10a82d444d9fd06b3e8c567b1158b76b2764b8f51bfd8f535064b0", upload-time = "2026-01-26T16:54:32Z" },
+]
+
+[[package]]
+name = "torch"
+version = "2.10.0+rocm7.0"
+source = { registry = "https://download.pytorch.org/whl/rocm7.0" }
+resolution-markers = [
+    "python_full_version >= '3.12'",
+    "python_full_version == '3.11.*'",
+    "python_full_version < '3.11'",
+]
+dependencies = [
+    { name = "filelock", marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra != 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "fsspec", marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra != 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "jinja2", marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra != 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "networkx", version = "3.4.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "setuptools", marker = "(python_full_version >= '3.12' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "sympy", version = "1.14.0", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra != 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "triton-rocm", marker = "(sys_platform == 'linux' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "typing-extensions", marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra != 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
+]
+wheels = [
+    { url = "https://download-r2.pytorch.org/whl/rocm7.0/torch-2.10.0%2Brocm7.0-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:d5bc9daea8fe8ce8b3cf43b7ea09bcc9bb42a1a3eed8abcf5eb6109f41acc0f2", upload-time = "2026-01-26T16:18:26Z" },
+    { url = "https://download-r2.pytorch.org/whl/rocm7.0/torch-2.10.0%2Brocm7.0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:f2e673a40d0c724a1713ca953d4a17eafb01b689c3aeb271aa4f4d30d7b69d6f", upload-time = "2026-01-26T16:18:26Z" },
+    { url = "https://download-r2.pytorch.org/whl/rocm7.0/torch-2.10.0%2Brocm7.0-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:613f6de3b4c39d3e0bd3e88e2fd20943356bc7f8388a494fee6545b181978c59", upload-time = "2026-01-26T16:18:26Z" },
 ]
 
 [[package]]
@@ -2462,9 +2497,10 @@ name = "torch-c-dlpack-ext"
 version = "0.1.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "torch", version = "2.5.1+rocm6.2", source = { registry = "https://download.pytorch.org/whl/rocm6.2" }, marker = "extra == 'extra-7-minisgl-rocm'" },
-    { name = "torch", version = "2.9.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm')" },
-    { name = "torch", version = "2.9.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "extra == 'extra-7-minisgl-cuda'" },
+    { name = "torch", version = "2.5.1+rocm6.2", source = { registry = "https://download.pytorch.org/whl/rocm6.2" }, marker = "extra == 'extra-7-minisgl-rocm' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "torch", version = "2.9.1", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-cuda' and extra != 'extra-7-minisgl-rocm' and extra != 'extra-7-minisgl-rocm70')" },
+    { name = "torch", version = "2.9.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "extra == 'extra-7-minisgl-cuda' or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "torch", version = "2.10.0+rocm7.0", source = { registry = "https://download.pytorch.org/whl/rocm7.0" }, marker = "(extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra != 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70') or (extra != 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/37/de/921b6491efce5c389a5ef9bbed3d2d6660005840dae488124173180859ab/torch_c_dlpack_ext-0.1.5.tar.gz", hash = "sha256:d06f0357d575d22a168cc77acb9020fc4bae30968ceb6718a055dcbe92bacabe", size = 12913, upload-time = "2026-01-12T11:25:08.484Z" }
 wheels = [
@@ -2487,7 +2523,7 @@ name = "tqdm"
 version = "4.67.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/09/a9/6ba95a270c6f1fbcd8dac228323f2777d886cb206987444e4bce66338dd4/tqdm-4.67.3.tar.gz", hash = "sha256:7d825f03f89244ef73f1d4ce193cb1774a8179fd96f31d7e1dcde62092b960bb", size = 169598, upload-time = "2026-02-03T17:35:53.048Z" }
 wheels = [
@@ -2501,8 +2537,8 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "filelock" },
     { name = "huggingface-hub" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
-    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
     { name = "packaging" },
     { name = "pyyaml" },
     { name = "regex" },
@@ -2527,6 +2563,16 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/b0/72/ec90c3519eaf168f22cb1757ad412f3a2add4782ad3a92861c9ad135d886/triton-3.5.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:61413522a48add32302353fdbaaf92daaaab06f6b5e3229940d21b5207f47579", size = 170425802, upload-time = "2025-11-11T17:40:53.209Z" },
     { url = "https://files.pythonhosted.org/packages/db/53/2bcc46879910991f09c063eea07627baef2bc62fe725302ba8f46a2c1ae5/triton-3.5.1-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:275a045b6ed670dd1bd005c3e6c2d61846c74c66f4512d6f33cc027b11de8fd4", size = 159940689, upload-time = "2025-11-11T17:51:55.938Z" },
     { url = "https://files.pythonhosted.org/packages/f2/50/9a8358d3ef58162c0a415d173cfb45b67de60176e1024f71fbc4d24c0b6d/triton-3.5.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:d2c6b915a03888ab931a9fd3e55ba36785e1fe70cbea0b40c6ef93b20fc85232", size = 170470207, upload-time = "2025-11-11T17:41:00.253Z" },
+]
+
+[[package]]
+name = "triton-rocm"
+version = "3.6.0"
+source = { registry = "https://download.pytorch.org/whl/rocm7.0" }
+wheels = [
+    { url = "https://download-r2.pytorch.org/whl/triton_rocm-3.6.0-cp310-cp310-linux_x86_64.whl", upload-time = "2026-01-20T18:39:31Z" },
+    { url = "https://download-r2.pytorch.org/whl/triton_rocm-3.6.0-cp311-cp311-linux_x86_64.whl", upload-time = "2026-01-20T18:39:32Z" },
+    { url = "https://download-r2.pytorch.org/whl/triton_rocm-3.6.0-cp312-cp312-linux_x86_64.whl", upload-time = "2026-01-20T18:39:32Z" },
 ]
 
 [[package]]
@@ -2566,7 +2612,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
     { name = "h11" },
-    { name = "typing-extensions", marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/5e/da/6eee1ff8b6cbeed47eeb5229749168e81eb4b7b999a1a15a7176e51410c9/uvicorn-0.44.0.tar.gz", hash = "sha256:6c942071b68f07e178264b9152f1f16dfac5da85880c4ce06366a96d70d4f31e", size = 86947, upload-time = "2026-04-06T09:23:22.826Z" }
 wheels = [
@@ -2582,7 +2628,7 @@ dependencies = [
     { name = "filelock" },
     { name = "platformdirs" },
     { name = "python-discovery" },
-    { name = "typing-extensions", marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11' or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm') or (extra == 'extra-7-minisgl-cuda' and extra == 'extra-7-minisgl-rocm70') or (extra == 'extra-7-minisgl-rocm' and extra == 'extra-7-minisgl-rocm70')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/97/c5/aff062c66b42e2183201a7ace10c6b2e959a9a16525c8e8ca8e59410d27a/virtualenv-21.2.1.tar.gz", hash = "sha256:b66ffe81301766c0d5e2208fc3576652c59d44e7b731fc5f5ed701c9b537fa78", size = 5844770, upload-time = "2026-04-09T18:47:11.482Z" }
 wheels = [

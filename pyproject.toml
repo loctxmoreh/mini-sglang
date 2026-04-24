@@ -25,7 +25,7 @@ dependencies = [
     "accelerate",
     "msgpack",
     "modelscope",
-    "torch<2.10.0",
+    "torch",
     "transformers>=4.56.0,<=4.57.3",
     "pyzmq",
     "uvicorn",
@@ -47,9 +47,18 @@ cuda = [
 # ROCm 6.2 build — torch resolves from pytorch-rocm62 (see [tool.uv.sources]
 # below). The rocm6.2 wheel index only ships torch 2.5.x, hence the pin.
 # Grows as kernel replacements are added during porting.
+# Host MI300 usage: HSA_OVERRIDE_GFX_VERSION=9.4.2 uv sync --extra rocm
 rocm = [
     "torch==2.5.1",
     "pytorch-triton-rocm==3.1.0",
+]
+# ROCm 7.0 build — torch resolves from pytorch-rocm70 (see [tool.uv.sources]
+# below). The rocm7.0 wheel index ships torch 2.10.x; triton package was
+# renamed from pytorch-triton-rocm to triton-rocm starting with ROCm 7.0.
+# Docker MI300 usage: docker build -f Dockerfile.rocm70 -t minisgl:rocm7.0-mi300 .
+rocm70 = [
+    "torch==2.10.0",
+    "triton-rocm==3.6.0",
 ]
 dev = [
     "pytest>=6.0",
@@ -154,18 +163,27 @@ ignore_missing_imports = true
 # ---------------------------------------------------------------------------
 # uv — named wheel indexes and platform-dependent torch sources
 #
-# The torch wheel is selected by which extra is active; cuda and rocm are
-# declared as conflicting extras so uv produces one lock covering both.
+# The torch wheel is selected by which extra is active; cuda, rocm, and rocm70
+# are declared as conflicting extras so uv produces one lock covering all.
 #
 # CUDA:
 #   uv sync --extra cuda --extra dev
 #
-# ROCm 6.2:
-#   uv sync --extra rocm --extra dev
+# ROCm 6.2 (MI250/MI300 host):
+#   HSA_OVERRIDE_GFX_VERSION=9.0.0 uv sync --extra rocm --extra dev   # MI250
+#   HSA_OVERRIDE_GFX_VERSION=9.4.2 uv sync --extra rocm --extra dev   # MI300
+#
+# ROCm 7.0 (MI300 Docker):
+#   uv sync --extra rocm70 --extra dev
 
 [[tool.uv.index]]
 name     = "pytorch-rocm62"
 url      = "https://download.pytorch.org/whl/rocm6.2"
+explicit = true
+
+[[tool.uv.index]]
+name     = "pytorch-rocm70"
+url      = "https://download.pytorch.org/whl/rocm7.0"
 explicit = true
 
 [[tool.uv.index]]
@@ -175,13 +193,19 @@ explicit = true
 
 [tool.uv.sources]
 torch = [
-    { index = "pytorch-cu128", extra = "cuda" },
-    { index = "pytorch-rocm62", extra = "rocm" },
+    { index = "pytorch-cu128",  extra = "cuda"   },
+    { index = "pytorch-rocm62", extra = "rocm"   },
+    { index = "pytorch-rocm70", extra = "rocm70" },
 ]
 # torch==2.5.1+rocm6.2 pulls in pytorch-triton-rocm==3.1.0 transitively;
-# route that lookup to the same ROCm index (it is not on PyPI).
+# route that lookup to the same ROCm 6.2 index (it is not on PyPI).
 pytorch-triton-rocm = [
     { index = "pytorch-rocm62", extra = "rocm" },
+]
+# torch==2.10.0+rocm7.0 requires triton-rocm==3.6.0 (package renamed from
+# pytorch-triton-rocm in ROCm 7.0); route to the ROCm 7.0 index.
+triton-rocm = [
+    { index = "pytorch-rocm70", extra = "rocm70" },
 ]
 
 [tool.uv]
@@ -189,5 +213,6 @@ conflicts = [
     [
         { extra = "cuda" },
         { extra = "rocm" },
+        { extra = "rocm70" },
     ],
 ]
