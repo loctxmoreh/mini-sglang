@@ -27,3 +27,10 @@ def is_sm90_supported() -> bool:
 
 def is_sm100_supported() -> bool:
     return is_arch_supported(10, 0)
+
+
+@functools.cache
+def is_rocm() -> bool:
+    import torch.version
+
+    return torch.version.hip is not None
