@@ -7,7 +7,7 @@ name = "minisgl"
 version = "0.1.0"
 description = "What is this?"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.13"
 license = {text = "MIT"}
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -25,20 +25,32 @@ dependencies = [
     "accelerate",
     "msgpack",
     "modelscope",
-    "torch<2.10.0",
+    "torch",
     "transformers>=4.56.0,<=4.57.3",
-    "flashinfer-python>=0.5.3",
     "pyzmq",
     "uvicorn",
     "fastapi",
     "prompt_toolkit",
     "openai",
     "apache-tvm-ffi>=0.1.4",
-    "sgl_kernel>=0.3.17.post1",
-    "quack-kernels",
+    "torch-c-dlpack-ext",
 ]
 
 [project.optional-dependencies]
+# CUDA build — torch resolves from pytorch-cu128 (see [tool.uv.sources] below).
+cuda = [
+    "torch<2.10.0",
+    "flashinfer-python>=0.5.3",
+    "sgl_kernel>=0.3.17.post1",
+    "quack-kernels",
+]
+# ROCm 7.2 build — torch resolves from pytorch-rocm72 (see [tool.uv.sources]
+# below). The rocm7.2 wheel index ships only torch==2.11.0 and
+# triton-rocm==3.6.0 for now.
+rocm = [
+    "torch==2.11.0",
+    "triton-rocm==3.6.0",
+]
 dev = [
     "pytest>=6.0",
     "pytest-cov>=2.0",
@@ -138,3 +150,43 @@ module = [
     "datasets.*",
 ]
 ignore_missing_imports = true
+
+# ---------------------------------------------------------------------------
+# uv — named wheel indexes and platform-dependent torch sources
+#
+# The torch wheel is selected by which extra is active; cuda and rocm are
+# declared as conflicting extras so uv produces one lock covering both.
+#
+# CUDA:
+#   uv sync --extra cuda --extra dev
+#
+# ROCm 7.2 (MI300, gfx942):
+#   uv sync --extra rocm --extra dev
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-rocm72"
+url = "https://download.pytorch.org/whl/rocm7.2"
+explicit = true
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu128",  extra = "cuda" },
+    { index = "pytorch-rocm72", extra = "rocm" },
+]
+# triton-rocm 3.6.0 is not on PyPI; route it to the ROCm 7.2 index.
+triton-rocm = [
+    { index = "pytorch-rocm72", extra = "rocm" },
+]
+
+[tool.uv]
+conflicts = [
+    [
+        { extra = "cuda" },
+        { extra = "rocm" },
+    ],
+]
