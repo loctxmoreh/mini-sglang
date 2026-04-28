@@ -5,8 +5,21 @@ import math
 from typing import Any, Callable, Dict, Tuple
 
 import torch
+from minisgl.utils import is_fi_available
 
 from .base import StateLessOP
+
+
+@functools.cache
+def _get_apply_rope():
+    """Return `apply_rope_with_cos_sin_cache_inplace` — flashinfer if available, else Triton."""
+    if is_fi_available():
+        from flashinfer import apply_rope_with_cos_sin_cache_inplace
+
+        return apply_rope_with_cos_sin_cache_inplace
+    from minisgl.kernel.triton.rotary import triton_apply_rope_with_cos_sin_cache_inplace
+
+    return triton_apply_rope_with_cos_sin_cache_inplace
 
 
 class RotaryEmbedding(StateLessOP):
@@ -32,9 +45,7 @@ class RotaryEmbedding(StateLessOP):
         self._cos_sin_cache = torch.cat((cos, sin), dim=-1)
         assert self.head_size in [64, 128, 256, 512]
 
-        from flashinfer import apply_rope_with_cos_sin_cache_inplace
-
-        self.apply_rope_with_cos_sin_cache_inplace = apply_rope_with_cos_sin_cache_inplace
+        self.apply_rope_with_cos_sin_cache_inplace = _get_apply_rope()
 
     def forward(
         self,
