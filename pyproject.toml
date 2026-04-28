@@ -33,7 +33,6 @@ dependencies = [
     "prompt_toolkit",
     "openai",
     "apache-tvm-ffi>=0.1.4",
-    "torch-c-dlpack-ext",
 ]
 
 [project.optional-dependencies]
@@ -43,6 +42,7 @@ cuda = [
     "flashinfer-python>=0.5.3",
     "sgl_kernel>=0.3.17.post1",
     "quack-kernels",
+    "torch-c-dlpack-ext",
 ]
 # ROCm 7.2 build — torch resolves from pytorch-rocm72 (see [tool.uv.sources]
 # below). The rocm7.2 wheel index ships only torch==2.11.0 and

@@ -12,6 +12,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         python${PYTHON_VERSION} \
         python${PYTHON_VERSION}-dev \
         python${PYTHON_VERSION}-venv \
+        build-essential \
+        ninja-build \
         ca-certificates \
         curl \
     && rm -rf /var/lib/apt/lists/*
@@ -19,6 +21,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install uv package manager
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 ENV PATH="/root/.local/bin:${PATH}"
+
+# Place tvm-ffi's JIT cache inside /app so the runtime stage's
+# COPY --from=builder /app picks it up (see pre-warm step below).
+ENV TVM_FFI_CACHE_DIR=/app/.cache/tvm-ffi
 
 WORKDIR /app
 
@@ -37,6 +43,19 @@ RUN uv sync \
 COPY python/ ./python/
 RUN uv sync --extra rocm --frozen
 
+# Stage 3: pre-build the tvm-ffi DLPack addon for ROCm. The auto-loader path
+# (`import tvm_ffi`) detects the GPU vendor at runtime via
+# torch.cuda.is_available(), which is False during `docker build` and would
+# cache the wrong (cpu) variant. Invoke the build script directly with
+# --build-with-rocm so the cache holds libtorch_c_dlpack_addon_torch{M}{m}-rocm.so
+# regardless of whether build-time GPU access is available.
+RUN mkdir -p ${TVM_FFI_CACHE_DIR} \
+    && .venv/bin/python -m tvm_ffi.utils._build_optional_torch_c_dlpack \
+        --output-dir ${TVM_FFI_CACHE_DIR} \
+        --libname auto \
+        --build-with-rocm \
+    && ls -la ${TVM_FFI_CACHE_DIR}/*.so
+
 # Runtime stage
 FROM rocm/dev-ubuntu-${UBUNTU_VERSION}:${ROCM_VERSION} AS runtime
 
@@ -46,6 +65,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
         python${PYTHON_VERSION} \
         python${PYTHON_VERSION}-venv \
+        build-essential \
+        ninja-build \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
