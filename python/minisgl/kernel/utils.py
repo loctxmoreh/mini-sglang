@@ -8,9 +8,33 @@ if TYPE_CHECKING:
 
 KERNEL_PATH = pathlib.Path(__file__).parent / "csrc"
 DEFAULT_INCLUDE = [str(KERNEL_PATH / "include")]
-DEFAULT_CFLAGS = ["-std=c++20", "-O3"]
-DEFAULT_CUDA_CFLAGS = ["-std=c++20", "-O3", "--expt-relaxed-constexpr"]
-DEFAULT_LDFLAGS = []
+
+
+def _is_rocm() -> bool:
+    import torch
+
+    return getattr(torch.version, "hip", None) is not None
+
+
+def _default_cflags() -> List[str]:
+    base = ["-std=c++20", "-O3"]
+    if _is_rocm():
+        # Host .cpp files compile via plain clang++ (no __HIP__); MINISGL_ROCM
+        # is what makes utils.h pick the kDLGPU = kDLROCM arm.
+        base.append("-DMINISGL_ROCM")
+    return base
+
+
+def _default_cuda_cflags() -> List[str]:
+    if _is_rocm():
+        # hipcc/clang rejects --expt-relaxed-constexpr (nvcc-only flag).
+        return ["-std=c++20", "-O3", "-DMINISGL_ROCM"]
+    return ["-std=c++20", "-O3", "--expt-relaxed-constexpr"]
+
+
+DEFAULT_CFLAGS = _default_cflags()
+DEFAULT_CUDA_CFLAGS = _default_cuda_cflags()
+DEFAULT_LDFLAGS: List[str] = []
 CPP_TEMPLATE_TYPE: TypeAlias = Union[int, float, bool]
 
 

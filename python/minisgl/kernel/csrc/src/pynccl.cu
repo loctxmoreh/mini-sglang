@@ -1,4 +1,10 @@
+// On ROCm use the system RCCL header (ships with hip_runtime.h).
+// On CUDA use the bundled NCCL 2.27 header.
+#ifdef __HIP__
+#include <rccl/rccl.h>
+#else
 #include <minisgl/nccl227.h>
+#endif
 #include <minisgl/tensor.h>
 #include <minisgl/utils.cuh>
 #include <minisgl/utils.h>
@@ -92,7 +98,7 @@ public:
 
   auto all_reduce(tvm::ffi::TensorView t, std::string op) const -> void {
     using namespace host;
-    RuntimeCheck(t.device().device_type == kDLCUDA,
+    RuntimeCheck(t.device().device_type == kDLGPU,
                  "Tensor must be on CUDA device");
     RuntimeCheck(t.is_contiguous(), "Tensor must be contiguous");
     const auto size_dim = static_cast<size_t>(t.shape().Product());
@@ -136,10 +142,10 @@ public:
   auto all_gather(tvm::ffi::TensorView dst, tvm::ffi::TensorView src) const
       -> void {
     using namespace host;
-    RuntimeCheck(src.device().device_type == kDLCUDA,
+    RuntimeCheck(src.device().device_type == kDLGPU,
                  "Tensor must be on CUDA device");
     RuntimeCheck(src.is_contiguous(), "Tensor must be contiguous");
-    RuntimeCheck(dst.device().device_type == kDLCUDA,
+    RuntimeCheck(dst.device().device_type == kDLGPU,
                  "Tensor must be on CUDA device");
     RuntimeCheck(dst.is_contiguous(), "Tensor must be contiguous");
     RuntimeCheck(dst.size(0) == src.size(0) * m_world_size,

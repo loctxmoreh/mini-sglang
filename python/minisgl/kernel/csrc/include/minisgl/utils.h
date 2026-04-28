@@ -30,6 +30,15 @@
 
 #include <dlpack/dlpack.h>
 
+// Device-type alias that resolves to the correct enum for the active GPU
+// runtime. Defined for both hipcc compilations (__HIP__) and plain clang++
+// host compilations on ROCm (MINISGL_ROCM, set by kernel/utils.py).
+#if defined(MINISGL_ROCM) || defined(__HIP__)
+inline constexpr DLDeviceType kDLGPU = kDLROCM;
+#else
+inline constexpr DLDeviceType kDLGPU = kDLCUDA;
+#endif
+
 #include <concepts>
 #include <ostream>
 #include <sstream>
