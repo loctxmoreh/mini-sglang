@@ -3,11 +3,36 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, List
 
+import functools
+
 import torch
-from minisgl.utils import is_sm90_supported, nvtx_annotate
+from minisgl.utils import is_fi_available, is_sm90_supported, nvtx_annotate
 
 if TYPE_CHECKING:
     from minisgl.core import Batch
+
+
+@functools.cache
+def _get_sampling_module():
+    """Return an object exposing `softmax`, `sampling_from_probs`,
+    `top_k_sampling_from_probs`, `top_p_sampling_from_probs`,
+    `top_k_top_p_sampling_from_probs` — flashinfer if available, else Triton."""
+    if is_fi_available():
+        import flashinfer.sampling as sampling
+
+        return sampling
+    from minisgl.kernel.triton import sampling as triton_sampling
+
+    class _TritonSamplingModule:
+        softmax = staticmethod(triton_sampling.triton_softmax)
+        sampling_from_probs = staticmethod(triton_sampling.triton_sampling_from_probs)
+        top_k_sampling_from_probs = staticmethod(triton_sampling.triton_top_k_sampling_from_probs)
+        top_p_sampling_from_probs = staticmethod(triton_sampling.triton_top_p_sampling_from_probs)
+        top_k_top_p_sampling_from_probs = staticmethod(
+            triton_sampling.triton_top_k_top_p_sampling_from_probs
+        )
+
+    return _TritonSamplingModule()
 
 
 @dataclass
@@ -27,7 +52,7 @@ def sample_impl(
     top_k: torch.Tensor | int | None,
     top_p: torch.Tensor | float | None,
 ) -> torch.Tensor:
-    import flashinfer.sampling as sampling
+    sampling = _get_sampling_module()
 
     probs = sampling.softmax(logits, temperatures, enable_pdl=is_sm90_supported())
     if top_k is None and top_p is None:
