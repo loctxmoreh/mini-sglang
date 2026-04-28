@@ -9,6 +9,10 @@ Both kernels keep the flashinfer call signatures byte-for-byte:
 The fused variant updates `residual` to `residual + x` and overwrites `x`
 with the normalized result in a single pass — that single-pass property is
 the whole reason the fused op exists, so we keep it.
+
+Inputs may be 2D `[M, N]` or 3D `[D0, D1, N]`; only the **last** dim must be
+contiguous (stride 1). Outer dims may be strided (e.g. `qkv.split(...)` slices
+viewed as 3D). Higher rank is collapsed to a contiguous `[M, N]` first.
 """
 from __future__ import annotations
 
@@ -22,15 +26,18 @@ def _rmsnorm_kernel(
     x_ptr,
     w_ptr,
     out_ptr,
-    stride_x_row,
-    stride_out_row,
+    stride_x_outer,
+    stride_x_inner,
+    stride_o_outer,
+    stride_o_inner,
     n_cols: tl.constexpr,
     eps,
     BLOCK: tl.constexpr,
 ):
-    row = tl.program_id(0)
-    x_row = x_ptr + row * stride_x_row
-    out_row = out_ptr + row * stride_out_row
+    pid_outer = tl.program_id(0)
+    pid_inner = tl.program_id(1)
+    x_row = x_ptr + pid_outer * stride_x_outer + pid_inner * stride_x_inner
+    out_row = out_ptr + pid_outer * stride_o_outer + pid_inner * stride_o_inner
 
     cols = tl.arange(0, BLOCK)
     mask = cols < n_cols
@@ -47,15 +54,18 @@ def _fused_add_rmsnorm_kernel(
     x_ptr,
     residual_ptr,
     w_ptr,
-    stride_x_row,
-    stride_r_row,
+    stride_x_outer,
+    stride_x_inner,
+    stride_r_outer,
+    stride_r_inner,
     n_cols: tl.constexpr,
     eps,
     BLOCK: tl.constexpr,
 ):
-    row = tl.program_id(0)
-    x_row = x_ptr + row * stride_x_row
-    r_row = residual_ptr + row * stride_r_row
+    pid_outer = tl.program_id(0)
+    pid_inner = tl.program_id(1)
+    x_row = x_ptr + pid_outer * stride_x_outer + pid_inner * stride_x_inner
+    r_row = residual_ptr + pid_outer * stride_r_outer + pid_inner * stride_r_inner
 
     cols = tl.arange(0, BLOCK)
     mask = cols < n_cols
@@ -83,9 +93,24 @@ def _pick_num_warps(block: int) -> int:
     return 16
 
 
-def _flatten2d(t: torch.Tensor) -> torch.Tensor:
-    n = t.shape[-1]
-    return t.reshape(-1, n)
+def _grid_for(t: torch.Tensor):
+    """Return (outer, inner, stride_outer, stride_inner) for a 2D or 3D tensor whose
+    last dim is contiguous. Higher rank must be collapsed by the caller first."""
+    if t.ndim == 1:
+        return 1, 1, 0, 0
+    if t.ndim == 2:
+        return t.shape[0], 1, t.stride(0), 0
+    assert t.ndim == 3, f"unexpected rank {t.ndim} after collapse"
+    return t.shape[0], t.shape[1], t.stride(0), t.stride(1)
+
+
+def _normalize_input(t: torch.Tensor, n: int) -> torch.Tensor:
+    """Collapse to a layout the kernel can address: ndim<=3, last-dim stride 1."""
+    assert t.shape[-1] == n
+    if t.ndim <= 3 and t.stride(-1) == 1:
+        return t
+    # Higher rank or strided last-dim → make contiguous and flatten leading dims.
+    return t.contiguous().view(-1, n)
 
 
 def triton_rmsnorm(
@@ -95,35 +120,38 @@ def triton_rmsnorm(
     out: torch.Tensor | None = None,
 ) -> torch.Tensor:
     """Match `flashinfer.rmsnorm`: out = x * rsqrt(mean(x^2) + eps) * weight (along last dim)."""
-    assert x.is_cuda and weight.is_cuda, "rmsnorm inputs must be on GPU"
+    assert x.is_cuda and weight.is_cuda
     assert weight.ndim == 1 and weight.shape[0] == x.shape[-1]
-    assert x.is_contiguous(), "x must be contiguous"
-    assert weight.is_contiguous(), "weight must be contiguous"
+    assert weight.is_contiguous()
 
     n = x.shape[-1]
     assert n <= _MAX_SUPPORTED_HIDDEN, (
-        f"hidden_dim={n} exceeds single-block RMSNorm capacity "
-        f"({_MAX_SUPPORTED_HIDDEN}); split-K variant not implemented yet"
+        f"hidden_dim={n} exceeds single-block RMSNorm capacity ({_MAX_SUPPORTED_HIDDEN})"
     )
-
+    inplace = out is x
     if out is None:
         out = torch.empty_like(x)
-    else:
+    elif not inplace:
         assert out.shape == x.shape and out.dtype == x.dtype
-        assert out.is_contiguous()
 
-    x2 = _flatten2d(x)
-    out2 = _flatten2d(out)
-    M = x2.shape[0]
-    if M == 0:
+    x_v = _normalize_input(x, n)
+    out_v = out if inplace else _normalize_input(out, n)
+    if x_v.numel() == 0:
         return out
+    assert x_v.stride(-1) == 1 and out_v.stride(-1) == 1
+
+    outer, inner, sx_o, sx_i = _grid_for(x_v)
+    _, _, so_o, so_i = _grid_for(out_v)
+
     BLOCK = triton.next_power_of_2(n)
-    _rmsnorm_kernel[(M,)](
-        x2,
+    _rmsnorm_kernel[(outer, inner)](
+        x_v,
         weight,
-        out2,
-        x2.stride(0),
-        out2.stride(0),
+        out_v,
+        sx_o,
+        sx_i,
+        so_o,
+        so_i,
         n,
         float(eps),
         BLOCK=BLOCK,
@@ -145,26 +173,31 @@ def triton_fused_add_rmsnorm(
     assert x.is_cuda and residual.is_cuda and weight.is_cuda
     assert x.shape == residual.shape and x.dtype == residual.dtype
     assert weight.ndim == 1 and weight.shape[0] == x.shape[-1]
-    assert x.is_contiguous() and residual.is_contiguous() and weight.is_contiguous()
+    assert weight.is_contiguous()
 
     n = x.shape[-1]
     assert n <= _MAX_SUPPORTED_HIDDEN, (
-        f"hidden_dim={n} exceeds single-block RMSNorm capacity "
-        f"({_MAX_SUPPORTED_HIDDEN}); split-K variant not implemented yet"
+        f"hidden_dim={n} exceeds single-block RMSNorm capacity ({_MAX_SUPPORTED_HIDDEN})"
     )
 
-    x2 = _flatten2d(x)
-    r2 = _flatten2d(residual)
-    M = x2.shape[0]
-    if M == 0:
+    x_v = _normalize_input(x, n)
+    r_v = _normalize_input(residual, n)
+    if x_v.numel() == 0:
         return
+    assert x_v.stride(-1) == 1 and r_v.stride(-1) == 1
+
+    outer, inner, sx_o, sx_i = _grid_for(x_v)
+    _, _, sr_o, sr_i = _grid_for(r_v)
+
     BLOCK = triton.next_power_of_2(n)
-    _fused_add_rmsnorm_kernel[(M,)](
-        x2,
-        r2,
+    _fused_add_rmsnorm_kernel[(outer, inner)](
+        x_v,
+        r_v,
         weight,
-        x2.stride(0),
-        r2.stride(0),
+        sx_o,
+        sx_i,
+        sr_o,
+        sr_i,
         n,
         float(eps),
         BLOCK=BLOCK,

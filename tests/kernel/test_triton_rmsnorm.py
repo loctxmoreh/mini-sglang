@@ -82,6 +82,45 @@ def test_fused_add_rmsnorm_matches_eager(dtype, hidden):
     torch.testing.assert_close(x, expected_x, atol=2e-2, rtol=2e-2)
 
 
+def test_rmsnorm_strided_3d_input_inplace():
+    """Real-world case: q_norm sees a [T, num_heads, head_dim] view of a qkv slice.
+    Outer dims are non-contiguous; only the last dim is unit-strided.
+    Must rotate in-place without copying, and must not touch K/V regions of the qkv buffer."""
+    _require_gpu()
+    torch.manual_seed(2)
+    device = torch.device("cuda:0")
+    T, num_qo, num_kv, hd = 9, 8, 2, 128
+    qo_dim = num_qo * hd
+    kv_dim = num_kv * hd
+
+    qkv = torch.randn(T, qo_dim + 2 * kv_dim, dtype=torch.float16, device=device)
+    qkv_orig = qkv.clone()
+    q = qkv[:, :qo_dim]
+    k = qkv[:, qo_dim : qo_dim + kv_dim]
+    v = qkv[:, qo_dim + kv_dim :]
+    v_before = v.clone()
+
+    weight = torch.randn(hd, dtype=torch.float16, device=device)
+
+    # Independent fp32 reference applied directly to the slices.
+    q3 = q.view(T, num_qo, hd)
+    k3 = k.view(T, num_kv, hd)
+    expected_q = _ref_rmsnorm(q3.contiguous(), weight, 1e-6)
+    expected_k = _ref_rmsnorm(k3.contiguous(), weight, 1e-6)
+
+    # In-place: forward_inplace pattern — the view shares storage with `qkv`.
+    qv = q.view(T, num_qo, hd)
+    kv = k.view(T, num_kv, hd)
+    triton_rmsnorm(qv, weight, 1e-6, out=qv)
+    triton_rmsnorm(kv, weight, 1e-6, out=kv)
+
+    torch.testing.assert_close(q.view(T, num_qo, hd), expected_q, atol=2e-2, rtol=2e-2)
+    torch.testing.assert_close(k.view(T, num_kv, hd), expected_k, atol=2e-2, rtol=2e-2)
+    # V slice and the underlying qkv buffer outside Q/K must be untouched.
+    torch.testing.assert_close(v, v_before)
+    torch.testing.assert_close(qkv[:, qo_dim + kv_dim :], qkv_orig[:, qo_dim + kv_dim :])
+
+
 def test_fused_add_rmsnorm_does_not_clobber_unrelated_rows():
     """Each row's update must not bleed into neighbors (single-pass single-row kernel)."""
     _require_gpu()

@@ -1,18 +1,12 @@
 from __future__ import annotations
 
 import functools
-import importlib.util
 from typing import Callable, Tuple
 
 import torch
+from minisgl.utils import is_fi_available
 
 from .base import BaseOP
-
-
-@functools.cache
-def is_fi_available() -> bool:
-    """Whether `flashinfer` is importable in this environment."""
-    return importlib.util.find_spec("flashinfer") is not None
 
 
 @functools.cache
