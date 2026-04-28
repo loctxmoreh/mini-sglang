@@ -1,0 +1,21 @@
+Fix torch_c_dlpack_ext device-suffix selection on ROCm.
+
+torch.cuda.is_available() returns True under HIP, so the loader picks
+libtorch_c_dlpack_addon_torch{N}-cuda.so, which then fails to dlopen
+libtorch_cuda.so (ROCm torch ships libtorch_hip.so instead). Treat HIP
+as cpu — the -cpu.so variant has no libtorch_cuda dependency and works
+regardless of the active GPU backend.
+
+Upstream: https://pypi.org/project/torch-c-dlpack-ext/
+
+--- a/core.py
++++ b/core.py
+@@ -52,7 +52,7 @@ def load_torch_c_dlpack_extension() -> None:
+         extension = "dylib"
+     else:
+         extension = "so"
+-    suffix = "cuda" if torch.cuda.is_available() else "cpu"
++    suffix = "cuda" if (torch.cuda.is_available() and not getattr(torch.version, "hip", None)) else "cpu"
+     lib_path = (
+         Path(__file__).parent
+         / f"libtorch_c_dlpack_addon_torch{version.major}{version.minor}-{suffix}.{extension}"

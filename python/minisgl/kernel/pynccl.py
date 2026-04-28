@@ -27,7 +27,10 @@ else:
 
 @functools.cache
 def _load_nccl_module() -> Module:
-    return load_aot("pynccl", cuda_files=["pynccl.cu"], extra_ldflags=["-lnccl"])
+    import torch
+
+    nccl_lib = "rccl" if getattr(torch.version, "hip", None) else "nccl"
+    return load_aot("pynccl", cuda_files=["pynccl.cu"], extra_ldflags=[f"-l{nccl_lib}"])
 
 
 @functools.cache

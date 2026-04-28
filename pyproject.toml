@@ -50,6 +50,10 @@ cuda = [
 rocm = [
     "torch==2.5.1",
     "pytorch-triton-rocm==3.1.0",
+    # Required at runtime for tvm_ffi.cpp.load (JIT kernel builds). On CUDA
+    # this is pulled in transitively by flashinfer-python; ROCm has no such
+    # carrier, so depend on it explicitly.
+    "ninja",
 ]
 dev = [
     "pytest>=6.0",

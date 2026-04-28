@@ -8,8 +8,28 @@ if TYPE_CHECKING:
 
 KERNEL_PATH = pathlib.Path(__file__).parent / "csrc"
 DEFAULT_INCLUDE = [str(KERNEL_PATH / "include")]
-DEFAULT_CFLAGS = ["-std=c++20", "-O3"]
-DEFAULT_CUDA_CFLAGS = ["-std=c++20", "-O3", "--expt-relaxed-constexpr"]
+
+
+def _default_cflags() -> list[str]:
+    import torch
+
+    base = ["-std=c++20", "-O3"]
+    if getattr(torch.version, "hip", None) is not None:
+        base.append("-DMINISGL_ROCM")
+    return base
+
+
+def _default_cuda_cflags() -> list[str]:
+    import torch
+
+    if getattr(torch.version, "hip", None) is not None:
+        # hipcc/clang++ rejects --expt-relaxed-constexpr (nvcc-only flag)
+        return ["-std=c++20", "-O3", "-DMINISGL_ROCM"]
+    return ["-std=c++20", "-O3", "--expt-relaxed-constexpr"]
+
+
+DEFAULT_CFLAGS = _default_cflags()
+DEFAULT_CUDA_CFLAGS = _default_cuda_cflags()
 DEFAULT_LDFLAGS = []
 CPP_TEMPLATE_TYPE: TypeAlias = Union[int, float, bool]
 
