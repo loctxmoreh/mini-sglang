@@ -34,3 +34,11 @@ def is_rocm() -> bool:
     import torch.version
 
     return torch.version.hip is not None
+
+
+@functools.cache
+def is_fi_available() -> bool:
+    """Whether `flashinfer` is importable in this environment."""
+    import importlib.util
+
+    return importlib.util.find_spec("flashinfer") is not None
