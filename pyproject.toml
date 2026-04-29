@@ -50,6 +50,7 @@ cuda = [
 rocm = [
     "torch==2.11.0",
     "triton-rocm==3.6.0",
+    "ninja",
 ]
 dev = [
     "pytest>=6.0",
